@@ -1,6 +1,7 @@
 """This module contains utils related to the claimbuster dataset"""
 
 from enum import Enum
+from typing import List
 import pandas as pd
 import os
 
@@ -69,6 +70,9 @@ def merge_data_labels_into_binary(data: pd.DataFrame) -> pd.DataFrame:
     data = data.replace(replacements)
     return data
 
+def filter_claimbuster_features(data: pd.DataFrame, features: List[str]):
+    """Filters the dataset based on the provided features"""
+    return data[features]
 
 def main():
     folder_path = os.path.join("data", "ClaimBuster_Datasets/datasets")
