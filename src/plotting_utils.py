@@ -43,6 +43,13 @@ def show_word_cloud(text: str, title: str, file_path: str = None):
         plt.imsave(file_path, word_cloud.to_array())
     plt.show()
 
+def should_save(file_path: str, force_save: bool):
+    """Check whether a file should be saved or not"""
+    if file_path is None:
+        return False
+    if not os.path.exists(file_path):
+        return False
+    return force_save
 
 def show_histogram_plot(
     x: Iterable,
@@ -50,6 +57,7 @@ def show_histogram_plot(
     xlabel: str = None,
     ylabel: str = None,
     file_path: str = None,
+    force_save = False,
 ):
     """Shows a histogram plot
 
@@ -71,8 +79,8 @@ def show_histogram_plot(
         plt.xlabel(xlabel)
     if ylabel is not None:
         plt.ylabel(ylabel)
-    if file_path is not None:
-        plt.savefig(file_path)
+    if should_save(file_path, force_save):
+        plt.savefig(file_path, force_save)
     plt.show()
 
 
@@ -84,6 +92,7 @@ def show_sub_plots_with_legends(
     ylabel: str,
     colors: Iterable[str],
     file_path: str = None,
+    force_save=False,
 ):
     """Shows sub plots with legends. It assumes that the y axis is shared and
     that the values are grouped in bacthes of the same length as tit"""
@@ -113,7 +122,7 @@ def show_sub_plots_with_legends(
     )
     plt.tight_layout()
     plt.show()
-    if file_path is not None:
+    if should_save(file_path, force_save):
         fig.savefig(file_path, bbox_inches="tight")
 
 
@@ -123,6 +132,7 @@ def show_sub_plots_pie_chart(
     titles: Iterable[str],
     labels: Iterable[str],
     file_path: str = None,
+    force_save = False
 ):
     """Shows sub plots with pie charts"""
     fig, axs = plt.subplots(
@@ -138,5 +148,5 @@ def show_sub_plots_pie_chart(
         ax.get_yaxis().set_visible(False)
     plt.tight_layout()
     plt.show()
-    if file_path is not None:
+    if should_save(file_path, force_save):
         fig.savefig(file_path)
