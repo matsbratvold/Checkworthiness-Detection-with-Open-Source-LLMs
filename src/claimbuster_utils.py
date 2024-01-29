@@ -23,6 +23,20 @@ class ClaimbusterBinaryLabel(Enum):
     NCS = 0
     """ Non-Check-worthy Sentence """
 
+class ClaimbusterSpeakerParty(Enum):
+    REPUBLICAN = "REPUBLICAN"
+    DEMOCRAT = "DEMOCRAT"
+    INDEPENDENT = "INDEPENDENT"
+
+class ClaimBusterSpeakerTitle(Enum):
+    GOVERNOR = "Governor"
+    SENATOR = "Senator"
+    PRESIDENT = "President"
+    CONGRESSMAN = "Congressman"
+    FORMER_VICE_PRESIDENT = "Former Vice President"
+    INDEPENDENT_CANDIDATE = "Independent Candidate"
+    VICE_PRESIDENT = "Vice President"
+
 
 def load_claimbuster_dataset(folder_path, use_binary_labels=False) -> pd.DataFrame:
     """Load the Claimbuser dataset
