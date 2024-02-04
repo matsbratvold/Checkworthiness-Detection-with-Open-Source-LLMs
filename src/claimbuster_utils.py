@@ -4,6 +4,7 @@ from enum import Enum
 from typing import List
 import pandas as pd
 import os
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 class ClaimbusterMultiClassLabel(Enum):
@@ -24,10 +25,12 @@ class ClaimbusterBinaryLabel(Enum):
     NCS = 0
     """ Non-Check-worthy Sentence """
 
+
 class ClaimbusterSpeakerParty(Enum):
     REPUBLICAN = "REPUBLICAN"
     DEMOCRAT = "DEMOCRAT"
     INDEPENDENT = "INDEPENDENT"
+
 
 class ClaimBusterSpeakerTitle(Enum):
     GOVERNOR = "Governor"
@@ -39,7 +42,17 @@ class ClaimBusterSpeakerTitle(Enum):
     VICE_PRESIDENT = "Vice President"
 
 
-def load_claimbuster_dataset(folder_path, use_binary_labels=False) -> pd.DataFrame:
+class NCS_RATIO(Enum):
+    """Ratio between CFS and NCS"""
+
+    DOUBLE = 2
+    TWO_AND_A_HALF = 2.5
+    TRIPLE = 3
+
+
+def load_claimbuster_dataset(
+    folder_path: str, ncs_ratio=NCS_RATIO.TWO_AND_A_HALF, use_binary_labels=True
+) -> pd.DataFrame:
     """Load the Claimbuser dataset
 
     Parameters
@@ -48,14 +61,16 @@ def load_claimbuster_dataset(folder_path, use_binary_labels=False) -> pd.DataFra
         If true, use the binary labels CFS and NCS, merging the original
         UFS and NFS labels
     """
-    groundtruth_path = os.path.join(folder_path, "groundtruth.csv")
-    groundtruth = pd.read_csv(groundtruth_path, index_col=0)
-    crowdsourced_path = os.path.join(folder_path, "groundtruth.csv")
-    crowdsourced = pd.read_csv(crowdsourced_path, index_col=0)
-    data = pd.concat([groundtruth, crowdsourced])
     if use_binary_labels:
-        data = merge_data_labels_into_binary(data)
-    return data
+        data = pd.read_json(os.path.join(folder_path, f"{ncs_ratio.value}xNCS.json"))
+        data.set_index("sentence_id", inplace=True)
+        data = data.rename(columns={"label": "Verdict", "text": "Text"})
+        return data
+    crowdsourced = pd.read_csv(
+        os.path.join(folder_path, "crowdsourced.csv"), index_col=0
+    )
+    groundtruth = pd.read_csv(os.path.join(folder_path, "groundtruth.csv"), index_col=0)
+    return pd.concat([crowdsourced, groundtruth])
 
 
 def merge_data_labels_into_binary(data: pd.DataFrame) -> pd.DataFrame:
@@ -70,9 +85,23 @@ def merge_data_labels_into_binary(data: pd.DataFrame) -> pd.DataFrame:
     data = data.replace(replacements)
     return data
 
+
 def filter_claimbuster_features(data: pd.DataFrame, features: List[str]):
     """Filters the dataset based on the provided features"""
     return data[features]
+
+
+def extract_tfid_features(data: pd.DataFrame, vectorizer: TfidfVectorizer, fit=False):
+    """Extract tfid features from the dataset"""
+    if fit:
+        vectorizer.fit(data["Text"])
+    tfidf_values = vectorizer.transform(data["Text"])
+    tfidf_feature_names = vectorizer.get_feature_names_out()
+    tfidf_data = pd.DataFrame(
+        tfidf_values.toarray(), columns=tfidf_feature_names, index=data.index
+    )
+    return pd.concat([data, tfidf_data], axis=1)
+
 
 def main():
     folder_path = os.path.join("data", "ClaimBuster_Datasets/datasets")

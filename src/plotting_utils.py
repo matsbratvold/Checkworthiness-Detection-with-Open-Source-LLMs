@@ -48,10 +48,10 @@ def should_save(file_path: str, force_save: bool):
     if file_path is None:
         return False
     if not os.path.exists(file_path):
-        return False
+        return True
     return force_save
 
-def show_histogram_plot(
+def show_bar_plot(
     x: Iterable,
     y: Iterable,
     xlabel: str = None,
@@ -59,7 +59,7 @@ def show_histogram_plot(
     file_path: str = None,
     force_save = False,
 ):
-    """Shows a histogram plot
+    """Shows a simple bar plot
 
     Parameters
     ---------------------------
@@ -80,7 +80,37 @@ def show_histogram_plot(
     if ylabel is not None:
         plt.ylabel(ylabel)
     if should_save(file_path, force_save):
-        plt.savefig(file_path, force_save)
+        plt.savefig(file_path)
+    plt.show()
+
+def show_histogram_plot(
+    x: Iterable,
+    bins: int = 10,
+    xlabel: str = None,
+    ylabel: str = None,
+    file_path: str = None,
+    force_save = False,
+):
+    """Shows a simple histogram plot
+
+    Parameters
+    ---------------------------
+    x: list
+        The x values
+    xlabel: str (default = None)
+        The x label
+    ylabel: str (default = None)
+        The y label
+    file_path: str (default = None)
+        The file path to save the plot
+    """
+    plt.hist(x, bins=bins)
+    if xlabel is not None:
+        plt.xlabel(xlabel)
+    if ylabel is not None:
+        plt.ylabel(ylabel)
+    if should_save(file_path, force_save):
+        plt.savefig(file_path)
     plt.show()
 
 
