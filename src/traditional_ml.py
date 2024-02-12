@@ -12,13 +12,14 @@ from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import TfidfVectorizer
 import pandas as pd
 from claimbuster_utils import load_claimbuster_dataset
-from sklearn.model_selection import cross_validate
+from sklearn.model_selection import cross_validate, RandomizedSearchCV
 from sklearn.preprocessing import MaxAbsScaler
 import random
 import numpy as np
 import nltk
-from nltk import pos_tag_sents, word_tokenize
+from nltk import pos_tag_sents
 import xgboost 
+from scipy.stats import logistic, randint
 
 POS_TAGS = [
     "MD",
@@ -175,16 +176,19 @@ class RandomClassifier:
 def main():
     nltk.download("averaged_perceptron_tagger")
     nltk.download("punkt")
-    extractor = TfidFeatureExtractor(stop_words="english")
+    tfidf_extractor = TfidFeatureExtractor(stop_words="english")
     scalar = MaxAbsScaler()
+    pos_extractor = POSFeatureExtractor()
     drop_text_feature = DropTextFeature()
+    classifier = xgboost.XGBClassifier(
+        objective="binary:logistic", random_state=42
+    )
 
     pipeline = ClaimbusterPipeline(
         [
-            ("pos", POSFeatureExtractor()),
             # ('debug1', DebugClassifier()),
-            ("word length", SentenceLengthFeatureExtractor()),
-            ("tfidf", extractor),
+            ("sentence length", SentenceLengthFeatureExtractor()),
+            # ("tfidf", tfidf_extractor),
             ("drop text feature", drop_text_feature),
             ("scalar", scalar),
             ("predictor", xgboost.XGBClassifier()),
@@ -193,8 +197,19 @@ def main():
     data = load_claimbuster_dataset("data/ClaimBuster_Datasets/datasets")[
         ["Text", "Verdict"]
     ]
-    x, y = data[["Text"]], data["Verdict"]
-    print(cross_validate(pipeline, x, y, cv=5, scoring=["f1_macro", "accuracy"]))
+    data = pos_extractor.transform(data)
+    print(data.head())
+    x, y = data.drop("Verdict", axis=1), data["Verdict"]
+    param_distributions = {
+        "predictor__n_estimators": randint(10, 1000),
+        "predictor__max_depth": randint(1, 10),
+        "predictor__learning_rate": logistic(0.01, 0.5),
+    }
+    search_cv = RandomizedSearchCV(pipeline, param_distributions=param_distributions, random_state=0)
+    best_params = search_cv.fit(x, y).best_params_
+    print(best_params)
+    pipeline.set_params(**best_params)
+    print(cross_validate(pipeline, x, y, cv=4, scoring=["f1_macro", "accuracy"]))
 
 
 if __name__ == "__main__":
