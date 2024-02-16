@@ -45,7 +45,7 @@ path_to_data = '../data/two_class'
 glove_dir = '../data/glove'
 embedding_dim = 300
 embedding_file_name = 'glove.txt'
-dataset_loc = path_to_data + 'kfold_25ncs.json'
+dataset_loc = os.path.join(path_to_data, 'kfold_25ncs.json')
 data = pd.read_json(dataset_loc, encoding="utf-8")
 
 # Read in labels and values (texts) for training and testing data

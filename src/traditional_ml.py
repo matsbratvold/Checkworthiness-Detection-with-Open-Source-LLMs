@@ -137,20 +137,20 @@ class ClaimbusterPipeline(Pipeline):
     # def __init__(self, **kwargs):
     #     super().__init__(**kwargs)
 
-    def fit(self, x: pd.DataFrame(), y: pd.Series):
+    def fit(self, x: pd.DataFrame, y: pd.Series):
         super().fit(x, y)
 
-    def predict(self, x: pd.DataFrame()):
+    def predict(self, x: pd.DataFrame):
         return super().predict(x)
 
 
 class DebugClassifier(BaseEstimator, TransformerMixin):
     """Used to inspect the pipeline"""
 
-    def fit(self, x: pd.DataFrame(), y: pd.Series):
+    def fit(self, x: pd.DataFrame, y: pd.Series):
         return self
 
-    def transform(self, x: pd.DataFrame()):
+    def transform(self, x: pd.DataFrame):
         print(f"{x.head()=}")
         return x
 
@@ -161,11 +161,11 @@ class RandomClassifier:
     def __init__(self) -> None:
         self.target_distribution = None
 
-    def fit(self, _: pd.DataFrame(), y: pd.Series):
+    def fit(self, _: pd.DataFrame, y: pd.Series):
         """Fits the random classifier according to the target distribution"""
         self.target_distribution = y.value_counts()
 
-    def predict(self, _: pd.DataFrame()):
+    def predict(self, _: pd.DataFrame):
         """Predicts the target distribution"""
         return random.choices(
             list(self.target_distribution.keys()),
@@ -205,11 +205,17 @@ def main():
         "predictor__max_depth": randint(1, 10),
         "predictor__learning_rate": logistic(0.01, 0.5),
     }
-    search_cv = RandomizedSearchCV(pipeline, param_distributions=param_distributions, random_state=0)
+    search_cv = RandomizedSearchCV(
+        pipeline, 
+        param_distributions=param_distributions, 
+        random_state=0,
+        n_iter=2
+    )
     best_params = search_cv.fit(x, y).best_params_
     print(best_params)
     pipeline.set_params(**best_params)
-    print(cross_validate(pipeline, x, y, cv=4, scoring=["f1_macro", "accuracy"]))
+    result = cross_validate(pipeline, x, y, cv=4, scoring=["f1_macro", "accuracy"])
+    print(result)
 
 
 if __name__ == "__main__":

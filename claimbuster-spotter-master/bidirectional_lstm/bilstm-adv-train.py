@@ -90,7 +90,7 @@ print("Parsing the GloVe word-embedding file...")
 glove_dir = '../data/glove/'
 
 embeddings_index = {}                                       
-f = open(os.path.join(glove_dir, 'glove6b300d.txt'))
+f = open(os.path.join(glove_dir, 'glove6b300d.txt'), encoding="utf8")
 i = 0
 for line in f:
     values = line.split()
