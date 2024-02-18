@@ -164,6 +164,7 @@ def eval_model(test_x, test_y, test_len, model_loc):
 def main():
     os.environ['CUDA_VISIBLE_DEVICES'] = ','.join([str(z) for z in FLAGS.cs_gpu])
     os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
+
     print_flags()
 
     if os.path.isdir(FLAGS.cs_tb_dir):
@@ -184,13 +185,7 @@ def main():
 
     if FLAGS.cs_k_fold > 1:
         all_data = data_load.load_crossval_data()
-        # Flatten each row in all_data.x
-        x = []
-        for row in all_data.x:
-            flattened_row = [element for sublist in row for element in sublist]
-            x.append(flattened_row[:2])
-        all_data.x = np.array(x)
-        print(all_data.x.shape)
+        all_data.x = np.array(all_data.x)
         all_data.y = np.array(all_data.y)
         logging.info("{} total cross-validation examples".format(all_data.get_length()))
 
