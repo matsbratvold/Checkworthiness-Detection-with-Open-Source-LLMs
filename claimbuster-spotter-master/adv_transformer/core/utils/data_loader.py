@@ -68,11 +68,11 @@ class DataLoader:
         self.data.shuffle()
 
     def compute_class_weights(self):
-        return compute_class_weight('balanced', classes=[z for z in range(FLAGS.cs_num_classes)], y=self.data.y)
+        return compute_class_weight('balanced', classes=np.array([z for z in range(FLAGS.cs_num_classes)]), y=self.data.y)
 
     @staticmethod
     def compute_class_weights_fold(y_list):
-        return compute_class_weight('balanced', classes=[z for z in range(FLAGS.cs_num_classes)], y=y_list)
+        return compute_class_weight('balanced', classes=np.array([z for z in range(FLAGS.cs_num_classes)]), y=y_list)
 
     def load_training_data(self):
         ret = Dataset(self.data.x, self.data.y, FLAGS.cs_random_state)
