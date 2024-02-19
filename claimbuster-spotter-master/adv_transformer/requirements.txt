@@ -59,9 +59,9 @@ Markdown==3.2.2
 MarkupSafe==1.1.1
 matplotlib==3.2.2
 mccabe==0.6.1
-mkl-fft==1.0.15
-mkl-random==1.1.1
-mkl-service==2.3.0
+mkl-fft==1.0.0.17
+mkl-random==1.0.1
+# mkl-service==2.3.0
 more-itertools==8.4.0
 multidict==4.7.6
 murmurhash==1.0.2
