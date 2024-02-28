@@ -127,7 +127,7 @@ class ClaimBusterContextualFeatureExtractor:
                 )]
 
     def add_contextual_features(
-        self, data: pd.DataFrame, output_path: str = None, sentences=4
+        self, data: pd.DataFrame, output_path: str = None, sentences=5
     ) -> pd.DataFrame:
         """Add contextual features to the dataset based on the original debate transcriptions."""
         data["previous_sentences"] = data["Text"].apply(lambda x: self.find_previous_sentences(x, sentences))
