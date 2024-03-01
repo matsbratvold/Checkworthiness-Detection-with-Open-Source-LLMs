@@ -143,7 +143,7 @@ class ClaimBusterContextualFeatureExtractor:
             for index, line in enumerate(lines):
                 if index > 0 and text in line:
                     previous_sentences = lines[max(0, index - sentences) : index]
-                    return " ".join(previous_sentences).strip()
+                    return " ".join(previous_sentences).replace("\n", "").strip()
         return ""
 
 
