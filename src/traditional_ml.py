@@ -70,6 +70,21 @@ POS_TAGS = [
     ")",
 ]
 
+class RandomForestFeatureSelector(BaseEstimator, TransformerMixin):
+    """Selects the best features"""
+
+    def __init__(self, k=100):
+        self.k = k
+        self.classifier = RandomForestClassifier(n_estimators=100) 
+
+    def fit(self, x: pd.DataFrame, y=None):
+        self.classifier.fit(x, y)
+        return self
+
+    def transform(self, x: Iterable):
+        x = pd.DataFrame(x)
+        return x.iloc[:, self.classifier.feature_importances_.argsort()[-self.k:]]
+
 class DropTextFeature(BaseEstimator, TransformerMixin):
     """Drops the text feature"""
 
@@ -180,18 +195,18 @@ def main():
     scalar = MaxAbsScaler()
     pos_extractor = POSFeatureExtractor()
     drop_text_feature = DropTextFeature()
-    classifier = xgboost.XGBClassifier(
-        objective="binary:logistic", random_state=42
-    )
+    classifier = svm.LinearSVC()
+    feature_selector = RandomForestFeatureSelector()
 
     pipeline = ClaimbusterPipeline(
         [
             # ('debug1', DebugClassifier()),
             ("sentence length", SentenceLengthFeatureExtractor()),
-            # ("tfidf", tfidf_extractor),
+            ("tfidf", tfidf_extractor),
             ("drop text feature", drop_text_feature),
-            ("scalar", scalar),
-            ("predictor", xgboost.XGBClassifier()),
+            # ("scalar", scalar),
+            ("feature selector", feature_selector),
+            ("predictor", classifier),
         ]
     )
     data = load_claimbuster_dataset("data/ClaimBuster_Datasets/datasets")[
@@ -200,20 +215,20 @@ def main():
     data = pos_extractor.transform(data)
     print(data.head())
     x, y = data.drop("Verdict", axis=1), data["Verdict"]
-    param_distributions = {
-        "predictor__n_estimators": randint(10, 1000),
-        "predictor__max_depth": randint(1, 10),
-        "predictor__learning_rate": logistic(0.01, 0.5),
-    }
-    search_cv = RandomizedSearchCV(
-        pipeline, 
-        param_distributions=param_distributions, 
-        random_state=0,
-        n_iter=2
-    )
-    best_params = search_cv.fit(x, y).best_params_
-    print(best_params)
-    pipeline.set_params(**best_params)
+    # param_distributions = {
+    #     "predictor__n_estimators": randint(10, 1000),
+    #     "predictor__max_depth": randint(1, 10),
+    #     "predictor__learning_rate": logistic(0.01, 0.5),
+    # }
+    # search_cv = RandomizedSearchCV(
+    #     pipeline, 
+    #     param_distributions=param_distributions, 
+    #     random_state=0,
+    #     n_iter=2
+    # )
+    # best_params = search_cv.fit(x, y).best_params_
+    # print(best_params)
+    # pipeline.set_params(**best_params)
     result = cross_validate(pipeline, x, y, cv=4, scoring=["f1_macro", "accuracy"])
     print(result)
 
