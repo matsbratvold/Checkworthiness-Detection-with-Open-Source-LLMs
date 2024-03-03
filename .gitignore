@@ -19,6 +19,7 @@ glove.6B.50d.txt
 glove.6B.100d.txt
 glove.6B.200d.txt
 glove.6B.300d.txt
+bert_pretrain*
 
 experiments/dump*.txt
 experiments/comparison.png
