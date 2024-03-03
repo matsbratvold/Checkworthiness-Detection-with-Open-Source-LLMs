@@ -21,17 +21,22 @@ def load_check_that_dataset(
   """Loads the CheckThat2021 task 1a dataset"""
   train = pd.read_csv(
     os.path.join(folder_path, "dataset_train_v1_english.tsv"),
+    index_col=1,
     sep="\t"
   )
-  dev = pd.read_csv(
-    os.path.join(folder_path, "dataset_dev_v1_english.tsv"),
-    sep="\t"
-  )
+  # Commenting out dev since it has a different structure.
+  # dev = pd.read_csv(
+  #   os.path.join(folder_path, "dataset_dev_v1_english.tsv"),
+  #   index_col=1,
+  #   sep="\t"
+  # )
   test = pd.read_csv(
     os.path.join(folder_path, "dataset_test_english.tsv"),
+    index_col=1,
     sep="\t"
   )
   if merge_dataset:
-    return pd.concat([train, dev, test])
+    combined = pd.concat([train, test])
+    return combined
   else:
-    return [train, dev, test]
+    return [train, test]
