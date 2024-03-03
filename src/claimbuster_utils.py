@@ -5,7 +5,8 @@ from typing import List
 import pandas as pd
 import os
 from sklearn.feature_extraction.text import TfidfVectorizer
-
+import re
+from nltk.tokenize import sent_tokenize
 
 class ClaimbusterMultiClassLabel(Enum):
     CFS = 1
@@ -51,7 +52,11 @@ class NCS_RATIO(Enum):
 
 
 def load_claimbuster_dataset(
-    folder_path: str, ncs_ratio=NCS_RATIO.TWO_AND_A_HALF, use_binary_labels=True
+    folder_path: str, 
+    ncs_ratio=NCS_RATIO.TWO_AND_A_HALF, 
+    use_binary_labels=True, 
+    use_contextual_features=False,
+    debate_transcripts_folder: str = None,
 ) -> pd.DataFrame:
     """Load the Claimbuser dataset
 
@@ -65,6 +70,10 @@ def load_claimbuster_dataset(
         data = pd.read_json(os.path.join(folder_path, f"{ncs_ratio.value}xNCS.json"))
         data.set_index("sentence_id", inplace=True)
         data = data.rename(columns={"label": "Verdict", "text": "Text"})
+        if use_contextual_features:
+            assert debate_transcripts_folder is not None, "You should provide a folder where the debate transcriptions are located"
+            extractor = ClaimBusterContextualFeatureExtractor(debate_transcripts_folder)
+            data = extractor.add_contextual_features(data)
         return data
     crowdsourced = pd.read_csv(
         os.path.join(folder_path, "crowdsourced.csv"), index_col=0
@@ -103,12 +112,54 @@ def extract_tfid_features(data: pd.DataFrame, vectorizer: TfidfVectorizer, fit=F
     return pd.concat([data, tfidf_data], axis=1)
 
 
+class ClaimBusterContextualFeatureExtractor:
+    """This class is used to extract contextual features from the original
+    debate transcriptions"""
+
+    def __init__(self, folder: str):
+        self.all_sentences = []
+        self.sentence_matcher = re.compile(r"[\.\?!]")
+        for file in os.listdir(folder):
+            with open(os.path.join(folder, file), "r", encoding="utf8") as f:
+                self.all_sentences += [(
+                    file,
+                    [line.strip() for line in sent_tokenize(f.read()) if len(line.strip()) > 0],
+                )]
+
+    def add_contextual_features(
+        self, data: pd.DataFrame, output_path: str = None, sentences=5
+    ) -> pd.DataFrame:
+        """Add contextual features to the dataset based on the original debate transcriptions."""
+        data["previous_sentences"] = data["Text"].apply(lambda x: self.find_previous_sentences(x, sentences))
+        if output_path is not None:
+            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            data.to_json(output_path, orient="records")
+        return data
+
+    def find_previous_sentences(self, text: str, sentences: int) -> str:
+        """Find the previous  within a debate transcript"""
+        for _, lines in self.all_sentences:
+            line: list
+            for index, line in enumerate(lines):
+                if index > 0 and text in line:
+                    previous_sentences = lines[max(0, index - sentences) : index]
+                    return " ".join(previous_sentences).replace("\n", "").strip()
+        return ""
+
+
 def main():
     folder_path = os.path.join("data", "ClaimBuster_Datasets/datasets")
     multi = load_claimbuster_dataset(folder_path)
     print(multi.head())
     binary = merge_data_labels_into_binary(multi)
     print(binary.head())
+    extractor = ClaimBusterContextualFeatureExtractor(
+        "data/ClaimBuster_Datasets/debate_transcripts"
+    )
+    contextual = extractor.add_contextual_features(
+        binary, "data/ClaimBuster_Datasets/datasets/2.5xNCS_contextual.json"
+    )
+    print(contextual.head())
 
 
 if __name__ == "__main__":
