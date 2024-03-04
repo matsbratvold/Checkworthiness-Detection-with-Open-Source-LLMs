@@ -1,11 +1,51 @@
 """This module uses LLMs to perform checkworthiness detection using Huggingface models
 through the transformers library"""
 
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, pipeline
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, pipeline, Pipeline
 from claimbuster_utils import load_claimbuster_dataset
-import torch
 from tqdm.auto import tqdm
-import json
+import enum
+import torch
+
+BNB_CONFIG = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_compute_dtype=torch.float16,
+)
+
+class HuggingFaceModel(enum.Enum):
+    MISTRAL_7B_INSTRUCT = "mistralai/Mistral-7B-Instruct-v0.2"
+    MIXTRAL_INSTRUCT = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+
+def load_huggingface_model(
+    model_id: HuggingFaceModel, 
+    bnb_config=BNB_CONFIG,
+    max_new_tokens=256,
+    return_full_text=False,
+) -> Pipeline: 
+    """Load a Huggingface LLM model as a pipeline. Note that this has only been tested
+    with models from Mistral, so it might not work with other models."""
+    model = AutoModelForCausalLM.from_pretrained(
+        model_id.value,
+        quantization_config = bnb_config,
+        device_map={"":0},
+    )
+
+    model.config.use_cache = False
+    model.config.pretraining_tp = 1
+
+    tokenizer = AutoTokenizer.from_pretrained(model_id.value)
+    tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.padding_side = "left"
+    pipe = pipeline(
+        "text-generation", 
+        model=model, 
+        tokenizer=tokenizer, 
+        return_full_text=return_full_text,
+        max_new_tokens=max_new_tokens,
+        pad_token_id=tokenizer.eos_token_id
+    )
+    return pipe
 
 
 def main():
