@@ -48,6 +48,8 @@ def load_huggingface_model(
     return pipe
 
 
+
+
 def main():
 
     device = "cuda" # the device to load the model onto
