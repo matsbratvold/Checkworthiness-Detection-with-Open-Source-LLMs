@@ -1,11 +1,15 @@
 """This module uses LLMs to perform checkworthiness detection using Huggingface models
 through the transformers library"""
 
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.metrics import classification_report
+from sklearn.model_selection import StratifiedKFold, cross_validate
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, pipeline, Pipeline
 from claimbuster_utils import load_claimbuster_dataset
 from tqdm.auto import tqdm
 import enum
 import torch
+import pandas as pd
 
 BNB_CONFIG = BitsAndBytesConfig(
     load_in_4bit=True,
@@ -16,6 +20,48 @@ BNB_CONFIG = BitsAndBytesConfig(
 class HuggingFaceModel(enum.Enum):
     MISTRAL_7B_INSTRUCT = "mistralai/Mistral-7B-Instruct-v0.2"
     MIXTRAL_INSTRUCT = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+
+class ThresholdOptimizer(BaseEstimator, TransformerMixin):
+
+    def __init__(self, label_column="Verdict"):
+        self.threshold = None
+        self.label_column = label_column
+
+    def fit(self, x: pd.DataFrame, y: pd.Series):
+        
+        y_gold = x[self.label_column].values
+
+        reports = []
+        for threshold in range(1, 100):
+            y_pred = x["score"].map(lambda x: 1 if x >= threshold else 0).values
+            report = classification_report(y_gold, y_pred, output_dict=True)
+            report["threshold"] = threshold
+            reports.append(report)
+        self.threshold = max(reports, key=lambda report: report["macro avg"]["f1-score"])["threshold"]
+    
+    def predict(self, x: pd.DataFrame):
+        predictions = x["score"].map(lambda x: 1 if x >= self.threshold else 0)
+        return predictions
+
+# Do a four fold cross validation where the threshold is optimized
+
+
+def run_llm_cross_validation(
+    data: pd.DataFrame,
+    n_splits=4,
+    label_column="Verdict",
+) -> pd.DataFrame:
+    """Run cross validation. Assumes that the predictions have already been 
+    generated trough the llm jupyter notebook"""
+    result = pd.DataFrame(cross_validate(
+        ThresholdOptimizer(label_column=label_column),
+        X=data,
+        y=data[label_column],
+        cv=StratifiedKFold(n_splits=n_splits),
+        scoring=["precision_macro", "recall_macro", "f1_macro", "accuracy"],
+    ))
+    result.loc["Average"] = result.mean()
+    return result
 
 def load_huggingface_model(
     model_id: HuggingFaceModel, 
