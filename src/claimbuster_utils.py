@@ -7,6 +7,7 @@ import os
 from sklearn.feature_extraction.text import TfidfVectorizer
 import re
 from nltk.tokenize import sent_tokenize
+from dataset_utils import convert_to_lora_dataset
 
 class ClaimbusterMultiClassLabel(Enum):
     CFS = 1
@@ -81,7 +82,6 @@ def load_claimbuster_dataset(
     groundtruth = pd.read_csv(os.path.join(folder_path, "groundtruth.csv"), index_col=0)
     return pd.concat([crowdsourced, groundtruth])
 
-
 def merge_data_labels_into_binary(data: pd.DataFrame) -> pd.DataFrame:
     """Merge the original mutliclass labels into the binary labels CFS and NCS"""
     replacements = {
@@ -149,17 +149,17 @@ class ClaimBusterContextualFeatureExtractor:
 
 def main():
     folder_path = os.path.join("data", "ClaimBuster_Datasets/datasets")
-    multi = load_claimbuster_dataset(folder_path)
-    print(multi.head())
-    binary = merge_data_labels_into_binary(multi)
-    print(binary.head())
-    extractor = ClaimBusterContextualFeatureExtractor(
-        "data/ClaimBuster_Datasets/debate_transcripts"
+    data = load_claimbuster_dataset(folder_path)
+    output_path = "data/ClaimBuster_Datasets/datasets/lora.json"
+    with open("prompts/ClaimBuster/standard/zero-shot-lora.txt") as f:
+        instruction = f.read().replace("\n", " ").strip()
+    lora = convert_to_lora_dataset(
+        data=data, 
+        instruction=instruction,
+        output_path=output_path
     )
-    contextual = extractor.add_contextual_features(
-        binary, "data/ClaimBuster_Datasets/datasets/2.5xNCS_contextual.json"
-    )
-    print(contextual.head())
+    print(lora.head())
+
 
 
 if __name__ == "__main__":

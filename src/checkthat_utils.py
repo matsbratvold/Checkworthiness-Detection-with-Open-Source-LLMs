@@ -7,6 +7,8 @@ from typing import List, Union
 import pandas as pd
 import os
 
+from dataset_utils import convert_to_lora_dataset
+
 class CheckThatLabel(enum.Enum):
   CHECK_WORTHY = 1
   """ Check-worthy Tweet """
@@ -40,3 +42,24 @@ def load_check_that_dataset(
     return combined
   else:
     return [train, test]
+
+def main():
+    folder_path = "data/CheckThat2021Task1a"
+    data = load_check_that_dataset(folder_path)
+    output_path = "data/CheckThat2021Task1a/lora.json"
+    with open("prompts/CheckThat/standard/zero-shot-lora.txt") as f:
+        instruction = f.read().replace("\n", " ").strip()
+    print(data.columns)
+    lora = convert_to_lora_dataset(
+        data=data, 
+        instruction=instruction,
+        output_path=output_path,
+        text_column="tweet_text",
+        label_column="check_worthiness",
+    )
+    print(lora.head())
+
+
+
+if __name__ == "__main__":
+    main()

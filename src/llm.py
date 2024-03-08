@@ -10,6 +10,7 @@ from tqdm.auto import tqdm
 import enum
 import torch
 import pandas as pd
+from typing import Union
 
 BNB_CONFIG = BitsAndBytesConfig(
     load_in_4bit=True,
@@ -68,9 +69,12 @@ def load_huggingface_model(
     bnb_config=BNB_CONFIG,
     max_new_tokens=256,
     return_full_text=False,
-) -> Pipeline: 
+    return_pipeline=True,
+) -> Union[Pipeline, AutoModelForCausalLM]: 
     """Load a Huggingface LLM model as a pipeline. Note that this has only been tested
-    with models from Mistral, so it might not work with other models."""
+    with models from Mistral, so it might not work with other models. If the parameter 
+    return_pipeline is set to True, then a pipeline containing a model and tokenizer is
+    returned. Otherwise, only the model is retutned"""
     model = AutoModelForCausalLM.from_pretrained(
         model_id.value,
         quantization_config = bnb_config,
@@ -79,6 +83,9 @@ def load_huggingface_model(
 
     model.config.use_cache = False
     model.config.pretraining_tp = 1
+
+    if not return_pipeline:
+        return model
 
     tokenizer = AutoTokenizer.from_pretrained(model_id.value)
     tokenizer.pad_token = tokenizer.eos_token
