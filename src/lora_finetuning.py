@@ -2,10 +2,14 @@
 https://github.com/huggingface/trl/blob/main/examples/research_projects/stack_llama/scripts/supervised_finetuning.py"""
 
 from peft import LoraConfig
-from transformers import AutoModelForCausalLM, TrainingArguments
+from sklearn.model_selection import train_test_split
+from transformers import Pipeline, TrainingArguments
 from trl import SFTTrainer
 import pandas as pd
-from datasets import from_pandas
+from datasets import Dataset
+from llm import load_huggingface_model, HuggingFaceModel
+from checkthat_utils import load_check_that_dataset
+from dataset_utils import convert_to_lora_dataset
 
 DEFAULT_TRAINING_ARGS = TrainingArguments(
     output_dir="./checkpoints",
@@ -27,10 +31,10 @@ DEFAULT_TRAINING_ARGS = TrainingArguments(
 )
 
 def run_training(
-    model: AutoModelForCausalLM, 
+    pipe: Pipeline, 
     run_name: str,
-    train_data: pd.Dataframe,
-    eval_data: pd.Dataframe,
+    train_data: pd.DataFrame,
+    eval_data: pd.DataFrame,
     args: TrainingArguments = DEFAULT_TRAINING_ARGS, 
 ):
     """Run model training using LORA"""
@@ -66,25 +70,38 @@ def run_training(
         ddp_find_unused_parameters=False,
     )
 
-    print(training_args)
+    train_dataset = Dataset.from_pandas(train_data)
+    eval_dataset = Dataset.from_pandas(eval_data)
 
-    train_dataset = from_pandas(train_dataset)
-    eval_dataset = from_pandas(eval_dataset)
-
+    model, tokenizer = pipe.model, pipe.tokenizer
     trainer = SFTTrainer(
         model=model,
+        tokenizer=tokenizer,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         args=training_args,
         peft_config=lora_config,
+        packing=True,
+        dataset_text_field="text"
     )
 
     trainer.train()
     trainer.model.save_pretrained(f"models/{run_name}/final_chekpoint/")
 
 def main():
-    model = None
-    run_training(model=model, run_name="test", train_data=None, eval_data=None)
+    pipe = load_huggingface_model(HuggingFaceModel.MISTRAL_7B_INSTRUCT)
+    data = load_check_that_dataset("data/CheckThat2021Task1a")
+    with open("prompts/CheckThat/standard/zero-shot-lora.txt") as f:
+        instruction = f.read().replace("\n", " ").strip()
+    lora_data = convert_to_lora_dataset(
+        data, 
+        label_column="check_worthiness", 
+        text_column="tweet_text", 
+        instruction=instruction
+    )
+    train, test = train_test_split(lora_data, train_size=0.75, random_state=0, stratify=lora_data["output"])
+
+    run_training(pipe=pipe, run_name="checkthat_test", train_data=train, eval_data=test)
 
 
 if __name__ == "__main__":
