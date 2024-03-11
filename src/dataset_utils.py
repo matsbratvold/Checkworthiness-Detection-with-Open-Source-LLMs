@@ -2,6 +2,7 @@
 
 import pandas as pd
 import os
+from sklearn.model_selection import StratifiedKFold
 
 def convert_to_lora_dataset(
     data: pd.DataFrame, 
@@ -26,8 +27,25 @@ def convert_to_lora_dataset(
         lora_data.to_json(output_path, orient="records")
     return lora_data
 
+def generate_cross_validation_datasets(
+        data: pd.DataFrame, 
+        n_splits=4, 
+        label_column="Verdict",
+        folder_path=None
+    ):
+    """Splits a dataset into n_splits dataset that is used for cross validation."""
+    splitter = StratifiedKFold(n_splits=n_splits, random_state=0, shuffle=True)
+    datasets = []
+    for i, (train_index, test_index) in enumerate(splitter.split(data, data[label_column])):
+        train = data.iloc[train_index]
+        test = data.iloc[test_index]
+        if folder_path is not None:
+            os.makedirs(folder_path, exist_ok=True)
+            train.to_json(os.path.join(folder_path, f"train_{i}.json"), orient="records")
+            test.to_json(os.path.join(folder_path, f"test_{i}.json"), orient="records")
+        datasets.append((train, test))
+    return datasets
 def main():
     pass
-
 if __name__ == "__main__":
     main()
