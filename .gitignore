@@ -30,6 +30,8 @@ output/
 output_*/
 local_files/
 
+models/*
+
 # Wand logging
 wandb/*
 

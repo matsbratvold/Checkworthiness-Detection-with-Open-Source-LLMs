@@ -23,6 +23,8 @@ class HuggingFaceModel(enum.Enum):
     MIXTRAL_INSTRUCT = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 
 class ThresholdOptimizer(BaseEstimator, TransformerMixin):
+    """Optimizing the threshold value (0-100) to separate check-worthy 
+    from non check-worthy claims"""
 
     def __init__(self, label_column="Verdict"):
         self.threshold = None
@@ -43,9 +45,6 @@ class ThresholdOptimizer(BaseEstimator, TransformerMixin):
     def predict(self, x: pd.DataFrame):
         predictions = x["score"].map(lambda x: 1 if x >= self.threshold else 0)
         return predictions
-
-# Do a four fold cross validation where the threshold is optimized
-
 
 def run_llm_cross_validation(
     data: pd.DataFrame,
