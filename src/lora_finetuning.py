@@ -109,7 +109,7 @@ def run_training(
     )
 
     trainer.train()
-    trainer.model.save_pretrained(f"models/{run_name}/final_chekpoint/")
+    trainer.model.save_pretrained(f"models/{run_name}/final_checkpoint")
 
 def output_to_pred(output, regex_finder):
     text = output[0]["generated_text"]
@@ -125,25 +125,40 @@ def main():
         instruction = f.read().replace("\n", " ").strip()
     
     # Run cross validation
+    reports = []
     for i in range(4):
-        print(f"Starting trainin on fold {i}")
-        pipe = load_huggingface_model(HuggingFaceModel.MISTRAL_7B_INSTRUCT)
-        train = pd.read_json(f"data/CheckThat2021Task1a/crossvaltrain_{i}.json")
-        test = pd.read_json(f"data/CheckThat2021Task1a/crossvaltest_{i}.json")
-        train_data = convert_to_lora_dataset(
-            train, 
-            label_column="check_worthiness", 
-            text_column="tweet_text", 
-            instruction=instruction
+        pipe = load_huggingface_model(
+            HuggingFaceModel.MISTRAL_7B_INSTRUCT,
+            lora_path=f"models/checkthat_crossval{i}/final_checkpoint/"
         )
-        run_training(pipe=pipe, run_name=f"checkthat_crossval{i}", train_data=train)
+        train = pd.read_json(f"data/CheckThat2021Task1a/crossval/train_{i}.json")
+        test = pd.read_json(f"data/CheckThat2021Task1a/crossval/test_{i}.json")
+        # train_data = convert_to_lora_dataset(
+        #     train, 
+        #     label_column="check_worthiness", 
+        #     text_column="tweet_text", 
+        #     instruction=instruction
+        # )
+        # run_training(pipe=pipe, run_name=f"checkthat_crossval{i}", train_data=train_data)
         print(f"Starting inference on test set for fold {i}")
         prompts = [f"{instruction} '''{text}'''" for text in test["tweet_text"]]
         outputs = pipe(prompts, batch_size=4)
         pred_finder = re.compile("0|1")
         preds = [output_to_pred(output, pred_finder) for output in outputs]
         print(preds)
-        print(classification_report(test["check_worthiness"], preds))
+        report = classification_report(test["check_worthiness"], preds, output_dict=True)
+        for key, value in report.copy().items():
+            if isinstance(value, dict):
+                for sub_key, sub_value in value.items():
+                    report[f"{key}_{sub_key}"] = sub_value
+                report.pop(key)
+        # Drop the support columns
+        report = {k: v for k, v in report.items() if not k.endswith("support")} 
+        reports.append(report)
+    result = pd.DataFrame(reports)
+    result.loc["Average"] = result.mean()
+    result.to_csv("results/CheckThat/crossval.csv")
+    
 
 if __name__ == "__main__":
     main()
