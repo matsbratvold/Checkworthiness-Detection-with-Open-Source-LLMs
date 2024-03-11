@@ -120,33 +120,30 @@ def output_to_pred(output, regex_finder):
 
 
 def main():
-    pipe = load_huggingface_model(HuggingFaceModel.MISTRAL_7B_INSTRUCT)
     data = load_check_that_dataset("data/CheckThat2021Task1a")
     with open("prompts/CheckThat/standard/zero-shot-lora.txt") as f:
         instruction = f.read().replace("\n", " ").strip()
-    lora_data = convert_to_lora_dataset(
-        data, 
-        label_column="check_worthiness", 
-        text_column="tweet_text", 
-        instruction=instruction
-    )
-    train, test = train_test_split(lora_data, train_size=0.75, random_state=0, stratify=lora_data["output"])
-    # run_training(pipe=pipe, run_name="checkthat_test", train_data=train)
-    # Merge model with trained LORA weights
-    lora_name = "models/checkthat_test/final_chekpoint"
-    test_data = data[data["tweet_text"].isin(test["input"].str.join(""))]
-    print(f"{test_data.shape=} {test.shape=}")
-    prompts = [f"{instruction} '''{text}'''" for text in test_data["tweet_text"]]
-    pred_finder = re.compile("0|1")
-    for i in range(2):
-        if i == 1:
-            pipe.model = AutoPeftModelForCausalLM.from_pretrained(lora_name, device_map={"":0}, quantization_config=BNB_CONFIG)
+    
+    # Run cross validation
+    for i in range(4):
+        print(f"Starting trainin on fold {i}")
+        pipe = load_huggingface_model(HuggingFaceModel.MISTRAL_7B_INSTRUCT)
+        train = pd.read_json(f"data/CheckThat2021Task1a/crossvaltrain_{i}.json")
+        test = pd.read_json(f"data/CheckThat2021Task1a/crossvaltest_{i}.json")
+        train_data = convert_to_lora_dataset(
+            train, 
+            label_column="check_worthiness", 
+            text_column="tweet_text", 
+            instruction=instruction
+        )
+        run_training(pipe=pipe, run_name=f"checkthat_crossval{i}", train_data=train)
+        print(f"Starting inference on test set for fold {i}")
+        prompts = [f"{instruction} '''{text}'''" for text in test["tweet_text"]]
         outputs = pipe(prompts, batch_size=4)
+        pred_finder = re.compile("0|1")
         preds = [output_to_pred(output, pred_finder) for output in outputs]
         print(preds)
-        print(classification_report(test_data["check_worthiness"], preds))
-
-
+        print(classification_report(test["check_worthiness"], preds))
 
 if __name__ == "__main__":
     main()

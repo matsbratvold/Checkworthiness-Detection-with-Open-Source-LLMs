@@ -12,14 +12,16 @@ from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import TfidfVectorizer
 import pandas as pd
 from claimbuster_utils import load_claimbuster_dataset
-from sklearn.model_selection import cross_validate, RandomizedSearchCV
+from checkthat_utils import load_check_that_dataset
+from sklearn.model_selection import cross_validate, RandomizedSearchCV, StratifiedKFold
 from sklearn.preprocessing import MaxAbsScaler
+from sklearn.metrics import classification_report, make_scorer, accuracy_score
 import random
 import numpy as np
 import nltk
 from nltk import pos_tag_sents
-import xgboost 
 from scipy.stats import logistic, randint
+
 
 POS_TAGS = [
     "MD",
@@ -88,23 +90,32 @@ class RandomForestFeatureSelector(BaseEstimator, TransformerMixin):
 class DropTextFeature(BaseEstimator, TransformerMixin):
     """Drops the text feature"""
 
+    def __init__(self, text_column="Text") -> None:
+        self.text_column = text_column
+
     def fit(self, x: pd.DataFrame, y=None):
         return self
 
     def transform(self, x: pd.DataFrame):
-        return x.drop("Text", axis=1)
+        return x.drop(self.text_column, axis=1)
     
 class SentenceLengthFeatureExtractor(BaseEstimator, TransformerMixin):
     """Sentence length feature extractor"""
 
+    def __init__(self, text_column="Text") -> None:
+        self.text_column = text_column
+
     def fit(self, x: pd.DataFrame, y=None):
         return self
     
     def transform(self, x: pd.DataFrame):
-        return x.assign(sentence_length = x["Text"].str.split().str.len())
+        return x.assign(sentence_length = x[self.text_column].str.split().str.len())
 
 class POSFeatureExtractor(BaseEstimator, TransformerMixin):
     """POS feature extractor"""
+
+    def __init__(self, text_column="Text") -> None:
+        self.text_column = text_column
 
     def fit(self, x: pd.DataFrame, y=None):
         return self
@@ -115,7 +126,7 @@ class POSFeatureExtractor(BaseEstimator, TransformerMixin):
         pos_values = [
             [pos_tag for _, pos_tag in pos_tags]
             for pos_tags in pos_tag_sents(
-                x["Text"].map(lambda x: nltk.word_tokenize(x))
+                x[self.text_column].map(lambda x: nltk.word_tokenize(x))
             )
         ]
         pos_counts = pd.DataFrame(columns=POS_TAGS, index=x.index)
@@ -129,17 +140,18 @@ class POSFeatureExtractor(BaseEstimator, TransformerMixin):
 class TfidFeatureExtractor(BaseEstimator, TransformerMixin):
     """Tfid feature extractor"""
 
-    def __init__(self, **kwargs):
+    def __init__(self, text_column="Text", **kwargs):
         self.vectorizer = TfidfVectorizer(**kwargs)
+        self.text_column = text_column
 
     def fit(self, x: pd.DataFrame, y=None):
         x = pd.DataFrame(x)
-        self.vectorizer.fit(x["Text"])
+        self.vectorizer.fit(x[self.text_column])
         return self
 
     def transform(self, x: pd.DataFrame):
         x = pd.DataFrame(x)
-        tf_id_values = self.vectorizer.transform(x["Text"]).toarray()
+        tf_id_values = self.vectorizer.transform(x[self.text_column]).toarray()
         tf_id_names = self.vectorizer.get_feature_names_out()
         tf_id_data = pd.DataFrame(tf_id_values, columns=tf_id_names, index=x.index)
         data = pd.concat([x, tf_id_data], axis=1)
@@ -187,49 +199,63 @@ class RandomClassifier:
             list(self.target_distribution.values()),
         )
 
+def classification_report_scorer(clf, X, y):
 
+    y_pred = clf.predict(X)
+    # Generate columns by flattening the classification_report
+    report = classification_report(y, y_pred, output_dict=True)
+    for key, value in report.copy().items():
+        if isinstance(value, dict):
+            for sub_key, sub_value in value.items():
+                report[f"{key}_{sub_key}"] = sub_value
+            report.pop(key)
+    # Drop the support columns
+    report = {k: v for k, v in report.items() if not k.endswith("support")}
+    return report
 def main():
     nltk.download("averaged_perceptron_tagger")
     nltk.download("punkt")
-    tfidf_extractor = TfidFeatureExtractor(stop_words="english")
+    text_column = "tweet_text"
+    label_column = "check_worthiness"
+    tfidf_extractor = TfidFeatureExtractor(stop_words="english", text_column=text_column)
     scalar = MaxAbsScaler()
-    pos_extractor = POSFeatureExtractor()
-    drop_text_feature = DropTextFeature()
-    classifier = svm.LinearSVC()
-    feature_selector = RandomForestFeatureSelector()
+    pos_extractor = POSFeatureExtractor(text_column)
+    drop_text_feature = DropTextFeature(text_column)
+    classifier = svm.SVC()
 
     pipeline = ClaimbusterPipeline(
         [
             # ('debug1', DebugClassifier()),
-            ("sentence length", SentenceLengthFeatureExtractor()),
+            ("sentence length", SentenceLengthFeatureExtractor(text_column)),
             ("tfidf", tfidf_extractor),
             ("drop text feature", drop_text_feature),
-            # ("scalar", scalar),
-            ("feature selector", feature_selector),
+            ("scalar", scalar),
             ("predictor", classifier),
         ]
     )
-    data = load_claimbuster_dataset("data/ClaimBuster_Datasets/datasets")[
-        ["Text", "Verdict"]
+    data = load_check_that_dataset("data/CheckThat2021Task1a")[
+        [text_column, label_column]
     ]
     data = pos_extractor.transform(data)
     print(data.head())
-    x, y = data.drop("Verdict", axis=1), data["Verdict"]
-    # param_distributions = {
-    #     "predictor__n_estimators": randint(10, 1000),
-    #     "predictor__max_depth": randint(1, 10),
-    #     "predictor__learning_rate": logistic(0.01, 0.5),
-    # }
-    # search_cv = RandomizedSearchCV(
-    #     pipeline, 
-    #     param_distributions=param_distributions, 
-    #     random_state=0,
-    #     n_iter=2
-    # )
-    # best_params = search_cv.fit(x, y).best_params_
-    # print(best_params)
-    # pipeline.set_params(**best_params)
-    result = cross_validate(pipeline, x, y, cv=4, scoring=["f1_macro", "accuracy"])
+    x, y = data.drop(label_column, axis=1), data[label_column]
+    param_distributions = {
+        "predictor__C": logistic(1, 0.5),
+    }
+    search_cv = RandomizedSearchCV(
+        pipeline, 
+        param_distributions=param_distributions, 
+        random_state=0,
+        n_iter=10
+    )
+    best_params = search_cv.fit(x, y).best_params_
+    print(best_params)
+    pipeline.set_params(**best_params)
+    splitter = StratifiedKFold(n_splits=4, shuffle=True, random_state=0)
+    result = pd.DataFrame(
+        cross_validate(pipeline, x, y, cv=splitter, scoring=classification_report_scorer)
+    )
+    result.loc["Average"] = result.mean()
     print(result)
 
 
