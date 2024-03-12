@@ -11,6 +11,7 @@ import pandas as pd
 from datasets import Dataset
 from llm import load_huggingface_model, HuggingFaceModel, BNB_CONFIG
 from checkthat_utils import load_check_that_dataset
+from claimbuster_utils import load_claimbuster_dataset
 from dataset_utils import convert_to_lora_dataset
 import re
 import torch
@@ -120,33 +121,40 @@ def output_to_pred(output, regex_finder):
 
 
 def main():
-    data = load_check_that_dataset("data/CheckThat2021Task1a")
-    with open("prompts/CheckThat/standard/zero-shot-lora.txt") as f:
+    folder="data/ClaimBuster_Datasets"
+    # data = load_check_that_dataset("data/CheckThat2021Task1a")
+    # with open("prompts/CheckThat/standard/zero-shot-lora.txt") as f:
+    #     instruction = f.read().replace("\n", " ").strip()
+    data = load_claimbuster_dataset("data/ClaimBuster_Datasets/datasets")
+    with open("prompts/ClaimBuster/standard/zero-shot-lora.txt") as f:
         instruction = f.read().replace("\n", " ").strip()
+    label_column = "Verdict"
+    text_column = "Text" 
+    
     
     # Run cross validation
     reports = []
     for i in range(4):
         pipe = load_huggingface_model(
             HuggingFaceModel.MISTRAL_7B_INSTRUCT,
-            lora_path=f"models/checkthat_crossval{i}/final_checkpoint/"
+            # lora_path=f"models/checkthat_crossval{i}/final_checkpoint/"
         )
-        train = pd.read_json(f"data/CheckThat2021Task1a/crossval/train_{i}.json")
-        test = pd.read_json(f"data/CheckThat2021Task1a/crossval/test_{i}.json")
-        # train_data = convert_to_lora_dataset(
-        #     train, 
-        #     label_column="check_worthiness", 
-        #     text_column="tweet_text", 
-        #     instruction=instruction
-        # )
-        # run_training(pipe=pipe, run_name=f"checkthat_crossval{i}", train_data=train_data)
+        train = pd.read_json(f"{folder}/crossval/train_{i}.json")
+        test = pd.read_json(f"{folder}/crossval/test_{i}.json")
+        train_data = convert_to_lora_dataset(
+            train, 
+            label_column=label_column, 
+            text_column=text_column, 
+            instruction=instruction
+        )
+        run_training(pipe=pipe, run_name=f"claimbuster_crossval{i}", train_data=train_data)
         print(f"Starting inference on test set for fold {i}")
-        prompts = [f"{instruction} '''{text}'''" for text in test["tweet_text"]]
+        prompts = [f"{instruction} '''{text}'''" for text in test[text_column]]
         outputs = pipe(prompts, batch_size=4)
         pred_finder = re.compile("0|1")
         preds = [output_to_pred(output, pred_finder) for output in outputs]
         print(preds)
-        report = classification_report(test["check_worthiness"], preds, output_dict=True)
+        report = classification_report(test[label_column], preds, output_dict=True)
         for key, value in report.copy().items():
             if isinstance(value, dict):
                 for sub_key, sub_value in value.items():
@@ -157,7 +165,7 @@ def main():
         reports.append(report)
     result = pd.DataFrame(reports)
     result.loc["Average"] = result.mean()
-    result.to_csv("results/CheckThat/crossval.csv")
+    result.to_csv("results/ClaimBuster/crossval.csv")
     
 
 if __name__ == "__main__":
