@@ -37,11 +37,12 @@ def generate_cross_validation_datasets(
     splitter = StratifiedKFold(n_splits=n_splits, random_state=0, shuffle=True)
     datasets = []
     for i, (train_index, test_index) in enumerate(splitter.split(data, data[label_column])):
-        train = data.iloc[train_index]
-        test = data.iloc[test_index]
+        train = data.iloc[train_index].copy()
+        test = data.iloc[test_index].copy()
         if folder_path is not None:
             os.makedirs(folder_path, exist_ok=True)
             train.to_json(os.path.join(folder_path, f"train_{i}.json"), orient="records")
+            test[test.index.name] = test.index
             test.to_json(os.path.join(folder_path, f"test_{i}.json"), orient="records")
         datasets.append((train, test))
     return datasets

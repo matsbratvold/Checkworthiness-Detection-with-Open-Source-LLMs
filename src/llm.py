@@ -18,6 +18,7 @@ import enum
 import torch
 import pandas as pd
 from typing import Union
+import os
 
 BNB_CONFIG = BitsAndBytesConfig(
     load_in_4bit=True,
@@ -69,21 +70,36 @@ class ThresholdOptimizer(BaseEstimator, TransformerMixin):
 
 def run_llm_cross_validation(
     data: pd.DataFrame,
+    crossval_folder: str,
     n_splits=4,
     label_column="Verdict",
+    save_folder=None,
 ) -> pd.DataFrame:
     """Run cross validation. Assumes that the predictions have already been
     generated trough the llm jupyter notebook"""
-    result = pd.DataFrame(
-        cross_validate(
-            ThresholdOptimizer(label_column=label_column),
-            X=data,
-            y=data[label_column],
-            cv=StratifiedKFold(n_splits=n_splits),
-            scoring=["precision_macro", "recall_macro", "f1_macro", "accuracy"],
-        )
-    )
+    reports = []
+    for i in range(n_splits):
+        train = pd.read_json(f"{crossval_folder}/train_{i}.json")
+        test = pd.read_json(f"{crossval_folder}/test_{i}.json")
+        optimizer = ThresholdOptimizer(label_column=label_column)
+        train_data = data[data.index.isin(train[data.index.name].values)]
+        optimizer.fit(train_data, None)
+        test_data = data[data.index.isin(test[data.index.name].values)]
+        preds = optimizer.predict(test_data)
+        report = classification_report(test_data[label_column], preds, output_dict=True)
+        for key, value in report.copy().items():
+            if isinstance(value, dict):
+                for sub_key, sub_value in value.items():
+                    report[f"{key}_{sub_key}"] = sub_value
+                report.pop(key)
+        # Drop the support columns
+        report = {k: v for k, v in report.items() if not k.endswith("support")} 
+        reports.append(report)
+    result = pd.DataFrame(reports)
     result.loc["Average"] = result.mean()
+    if save_folder is not None:
+        os.makedirs(save_folder, exist_ok=True)
+        result.to_csv(f"{save_folder}/crossval.csv")
     return result
 
 
