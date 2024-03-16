@@ -8,9 +8,7 @@ from transformers import TrainingArguments, Pipeline
 from trl import SFTTrainer
 import pandas as pd
 from datasets import Dataset
-from llm import load_huggingface_model, HuggingFaceModel, BNB_CONFIG
-from checkthat_utils import load_check_that_dataset
-from claimbuster_utils import load_claimbuster_dataset
+from llm import load_huggingface_model, HuggingFaceModel
 from dataset_utils import convert_to_lora_dataset, Dataset
 import re
 from result_analysis import flatten_classification_report
@@ -139,7 +137,7 @@ def main():
         lora_path = f"models/{dataset.value}/crossval{i}/final_checkpoint"
         pipe = load_huggingface_model(
             model_id,
-            lora_path=f"models/checkthat_crossval{i}/final_checkpoint/" if already_finetuned else None
+            lora_path=lora_path if already_finetuned else None
         )
         if not already_finetuned:
             print(f"Starting training on train set for fold {i}")
