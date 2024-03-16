@@ -1,8 +1,13 @@
 """This module contains common utils to be used for several datasets"""
 
+import enum
 import pandas as pd
 import os
 from sklearn.model_selection import StratifiedKFold
+
+class Dataset(enum.Enum):
+    CLAIMBUSTER = "ClaimBuster"
+    CHECK_THAT = "CheckThat"
 
 def convert_to_lora_dataset(
     data: pd.DataFrame, 
@@ -36,11 +41,21 @@ def generate_cross_validation_datasets(
     """Splits a dataset into n_splits dataset that is used for cross validation."""
     splitter = StratifiedKFold(n_splits=n_splits, random_state=0, shuffle=True)
     datasets = []
+    existing_splits = set(os.listdir(folder_path))
+    existing_train = [file for file in existing_splits if "train" in file]
+    existing_test = [file for file in existing_splits if "test" in file]
+    if len(existing_train) == n_splits and len(existing_test) == n_splits:
+        for i in range(n_splits):
+            train = pd.read_json(os.path.join(folder_path, f"train_{i}.json"))
+            test = pd.read_json(os.path.join(folder_path, f"test_{i}.json"))
+            datasets.append((train, test))
+        return datasets
     for i, (train_index, test_index) in enumerate(splitter.split(data, data[label_column])):
         train = data.iloc[train_index].copy()
         test = data.iloc[test_index].copy()
         if folder_path is not None:
             os.makedirs(folder_path, exist_ok=True)
+            train[train.index.name] = train.index
             train.to_json(os.path.join(folder_path, f"train_{i}.json"), orient="records")
             test[test.index.name] = test.index
             test.to_json(os.path.join(folder_path, f"test_{i}.json"), orient="records")

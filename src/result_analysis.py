@@ -4,13 +4,18 @@ including exploration of false positives and false negatives"""
 from typing import Iterable
 import pandas as pd
 from llm import HuggingFaceModel
-import enum
 import os
 
-class Dataset(enum.Enum):
-
-    CLAIMBUSTER = "ClaimBuster"
-    CHECK_THAT = "CheckThat"
+def flatten_classification_report(report: dict, drop_support_columns = True) -> dict:
+    """Flattens a classification report generated from sklearn"""
+    for key, value in report.copy().items():
+        if isinstance(value, dict):
+            for sub_key, sub_value in value.items():
+                report[f"{key}_{sub_key}"] = sub_value
+            report.pop(key)
+    if drop_support_columns:
+        report = {k: v for k, v in report.items() if not k.endswith("support")} 
+    return report
 
 def print_padded_text(text: str, total_length = 50):
     """Pad with hastags at the beggining and end of the text and center it."""

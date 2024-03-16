@@ -17,8 +17,12 @@ from peft import AutoPeftModelForCausalLM, LoraConfig
 import enum
 import torch
 import pandas as pd
-from typing import Union
+from typing import List, Union
 import os
+import json
+import re
+import numpy as np
+from result_analysis import flatten_classification_report
 
 BNB_CONFIG = BitsAndBytesConfig(
     load_in_4bit=True,
@@ -86,14 +90,9 @@ def run_llm_cross_validation(
         optimizer.fit(train_data, None)
         test_data = data[data.index.isin(test[data.index.name].values)]
         preds = optimizer.predict(test_data)
-        report = classification_report(test_data[label_column], preds, output_dict=True)
-        for key, value in report.copy().items():
-            if isinstance(value, dict):
-                for sub_key, sub_value in value.items():
-                    report[f"{key}_{sub_key}"] = sub_value
-                report.pop(key)
-        # Drop the support columns
-        report = {k: v for k, v in report.items() if not k.endswith("support")} 
+        report = flatten_classification_report(
+            classification_report(test_data[label_column], preds, output_dict=True)
+        )
         reports.append(report)
     result = pd.DataFrame(reports)
     result.loc["Average"] = result.mean()
@@ -102,6 +101,54 @@ def run_llm_cross_validation(
         result.to_csv(f"{save_folder}/crossval.csv")
     return result
 
+class ProgressDataset(torch.utils.data.Dataset):
+    """Dataset that can be used with tdqm to show progress"""
+    def __init__(self, dataset):
+        self.dataset = dataset
+
+    def __getitem__(self, idx):
+        return self.dataset[idx]
+
+    def __len__(self):
+        return len(self.dataset)
+    
+def generate_llm_predictions(
+    data: pd.DataFrame,
+    prompts: List[str],
+    pipe: Pipeline,
+    save_path: str,
+    batch_size=128,
+):
+    """Generate a set of predictions using an LLM"""
+    prompts_data = ProgressDataset(prompts)
+    dataset_with_scores = data.copy()
+    dict_matcher = re.compile(r"{.*}")
+    score_matcher = re.compile(r"([Ss]core[^\d]*)(\d+)")
+    non_check_worthy_matcher = re.compile(
+        r"(non-checkworthy)|(not check-worthy)|(non check-worthy)"
+    )
+    responses = pipe(prompts_data, batch_size=batch_size)
+    for index, result in enumerate(tqdm(responses, total=len(prompts))):
+        response = result[0]["generated_text"].replace("\n", "")
+        dataset_index = data.index[index]
+        try:
+            parsed_json = json.loads(dict_matcher.search(response).group(0))
+            dataset_with_scores.loc[dataset_index, "score"] = parsed_json["score"]
+            dataset_with_scores.loc[dataset_index, "reasoning"] = parsed_json["reasoning"]
+        except (json.decoder.JSONDecodeError, AttributeError, KeyError) as e:
+            score = score_matcher.search(response)
+            if score is not None:
+                score = score[2]
+            else:
+                score = 0.0 if non_check_worthy_matcher.search(response) else np.nan
+            dataset_with_scores.loc[dataset_index, "score"] = score
+            dataset_with_scores.loc[dataset_index, "reasoning"] = response
+            continue
+    columns =  ["Verdict", "score", "Text", "reasoning"]
+    dataset_with_scores = dataset_with_scores[columns]
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    dataset_with_scores.to_csv(save_path, index=True)
+    return dataset_with_scores
 
 def load_huggingface_model(
     model_id: HuggingFaceModel,

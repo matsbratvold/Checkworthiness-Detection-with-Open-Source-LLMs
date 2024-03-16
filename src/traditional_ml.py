@@ -21,6 +21,7 @@ import numpy as np
 import nltk
 from nltk import pos_tag_sents
 from scipy.stats import logistic, randint
+from result_analysis import flatten_classification_report
 
 
 POS_TAGS = [
@@ -203,15 +204,9 @@ def classification_report_scorer(clf, X, y):
 
     y_pred = clf.predict(X)
     # Generate columns by flattening the classification_report
-    report = classification_report(y, y_pred, output_dict=True)
-    for key, value in report.copy().items():
-        if isinstance(value, dict):
-            for sub_key, sub_value in value.items():
-                report[f"{key}_{sub_key}"] = sub_value
-            report.pop(key)
-    # Drop the support columns
-    report = {k: v for k, v in report.items() if not k.endswith("support")}
-    return report
+    return flatten_classification_report(
+        classification_report(y, y_pred, output_dict=True)
+    )
 def main():
     nltk.download("averaged_perceptron_tagger")
     nltk.download("punkt")
