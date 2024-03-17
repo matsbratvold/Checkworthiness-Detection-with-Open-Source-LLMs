@@ -25,7 +25,7 @@ def print_padded_text(text: str, total_length = 50):
 
 def generate_error_analysis_report(
     results: Iterable[pd.DataFrame],
-    models: Iterable[enum.Enum],
+    model_names: Iterable[str],
     folder_path: str = None,
     label_column_name = "Verdict",
     text_column_name = "Text",
@@ -37,7 +37,6 @@ def generate_error_analysis_report(
     false_negative_ids = set()
     overlapping_false_positive_ids = None
     overlapping_false_negative_ids = None
-    model_names = [model.name for model in models]
     filenames = ["false_negatives.csv", "false_positives.csv"]
     for name, result in zip(model_names, results):
         print("#" * 50)
