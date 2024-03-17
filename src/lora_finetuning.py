@@ -13,6 +13,7 @@ from dataset_utils import convert_to_lora_dataset, Dataset, ProgressDataset
 import re
 from result_analysis import flatten_classification_report
 from tqdm.auto import tqdm
+import os
 
 DEFAULT_TRAINING_ARGS = TrainingArguments(
     output_dir="checkpoints/",
@@ -121,7 +122,7 @@ def output_to_pred(output, regex_finder):
 
 
 def main():
-    dataset = Dataset.CLAIMBUSTER
+    dataset = Dataset.CHECK_THAT
     already_finetuned = True
     folder="data/ClaimBuster_Datasets" if dataset == Dataset.CLAIMBUSTER else "data/CheckThat2021Task1a"
     with open(f"prompts/{dataset.value}/standard/zero-shot-lora.txt") as f:
@@ -129,13 +130,14 @@ def main():
     label_column = "Verdict" if dataset == Dataset.CLAIMBUSTER else "check_worthiness"
     text_column = "Text" if dataset == Dataset.CLAIMBUSTER else "tweet_text"
     model_id = HuggingFaceModel.MISTRAL_7B_INSTRUCT
-    batch_size = 64
+    batch_size = 32
+    index_col = "sentence_id" if dataset == Dataset.CLAIMBUSTER else "tweet_id"
     
     # Run cross validation
     reports = []
-    predictions = pd.DataFrame()
+    predictions = pd.DataFrame(index=pd.Index([], name=index_col))
     for i in range(4):
-        lora_path = f"models/claimbuster_crossval{i}/final_checkpoint"
+        lora_path = f"models/checkthat_crossval{i}/final_checkpoint"
         pipe = load_huggingface_model(
             model_id,
             lora_path=lora_path if already_finetuned else None
@@ -156,13 +158,16 @@ def main():
         outputs = pipe(prompts, batch_size=batch_size)
         pred_finder = re.compile("0|1")
         preds = []
-        for output in tqdm(outputs):
-            preds.append(output_to_pred(output, pred_finder))
-        predictions.loc[test.index, "prediction"] = preds
+        for index, output in enumerate(tqdm(outputs)):
+            pred = output_to_pred(output, pred_finder)
+            preds.append(pred)
+            dataset_index = test[index_col].values[index]
+            predictions.loc[dataset_index, "prediction"] = pred
         report = flatten_classification_report(
             classification_report(test[label_column], preds, output_dict=True)
         )
         reports.append(report)
+    os.makedirs(f"results/{dataset.value}/{model_id.name}/lora", exist_ok=True)
     predictions.to_csv(f"results/{dataset.value}/{model_id.name}/lora/predictions.csv")
     result = pd.DataFrame(reports)
     result.loc["Average"] = result.mean()
