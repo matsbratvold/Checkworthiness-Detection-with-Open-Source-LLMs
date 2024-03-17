@@ -22,6 +22,7 @@ import os
 import json
 import re
 import numpy as np
+from dataset_utils import ProgressDataset
 from result_analysis import flatten_classification_report
 
 BNB_CONFIG = BitsAndBytesConfig(
@@ -101,16 +102,6 @@ def run_llm_cross_validation(
         result.to_csv(f"{save_folder}/crossval.csv")
     return result
 
-class ProgressDataset(torch.utils.data.Dataset):
-    """Dataset that can be used with tdqm to show progress"""
-    def __init__(self, dataset):
-        self.dataset = dataset
-
-    def __getitem__(self, idx):
-        return self.dataset[idx]
-
-    def __len__(self):
-        return len(self.dataset)
     
 def generate_llm_predictions(
     data: pd.DataFrame,

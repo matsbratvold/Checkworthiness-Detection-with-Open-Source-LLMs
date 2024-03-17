@@ -4,10 +4,22 @@ import enum
 import pandas as pd
 import os
 from sklearn.model_selection import StratifiedKFold
+import torch
 
 class Dataset(enum.Enum):
     CLAIMBUSTER = "ClaimBuster"
     CHECK_THAT = "CheckThat"
+
+class ProgressDataset(torch.utils.data.Dataset):
+    """Dataset that can be used with tdqm to show progress"""
+    def __init__(self, dataset):
+        self.dataset = dataset
+
+    def __getitem__(self, idx):
+        return self.dataset[idx]
+
+    def __len__(self):
+        return len(self.dataset)
 
 def convert_to_lora_dataset(
     data: pd.DataFrame, 

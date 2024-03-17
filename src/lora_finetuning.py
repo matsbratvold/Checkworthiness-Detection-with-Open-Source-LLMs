@@ -9,7 +9,7 @@ from trl import SFTTrainer
 import pandas as pd
 from datasets import Dataset
 from llm import load_huggingface_model, HuggingFaceModel
-from dataset_utils import convert_to_lora_dataset, Dataset
+from dataset_utils import convert_to_lora_dataset, Dataset, ProgressDataset
 import re
 from result_analysis import flatten_classification_report
 from tqdm.auto import tqdm
@@ -122,19 +122,20 @@ def output_to_pred(output, regex_finder):
 
 def main():
     dataset = Dataset.CLAIMBUSTER
-    already_finetuned = False
+    already_finetuned = True
     folder="data/ClaimBuster_Datasets" if dataset == Dataset.CLAIMBUSTER else "data/CheckThat2021Task1a"
     with open(f"prompts/{dataset.value}/standard/zero-shot-lora.txt") as f:
         instruction = f.read().replace("\n", " ").strip()
     label_column = "Verdict" if dataset == Dataset.CLAIMBUSTER else "check_worthiness"
     text_column = "Text" if dataset == Dataset.CLAIMBUSTER else "tweet_text"
     model_id = HuggingFaceModel.MISTRAL_7B_INSTRUCT
+    batch_size = 64
     
     # Run cross validation
     reports = []
     predictions = pd.DataFrame()
     for i in range(4):
-        lora_path = f"models/{dataset.value}/crossval{i}/final_checkpoint"
+        lora_path = f"models/claimbuster_crossval{i}/final_checkpoint"
         pipe = load_huggingface_model(
             model_id,
             lora_path=lora_path if already_finetuned else None
@@ -151,8 +152,8 @@ def main():
             run_training(pipe=pipe, run_name=f"claimbuster_crossval{i}", train_data=train_data) 
         print(f"Starting inference on test set for fold {i}")
         test = pd.read_json(f"{folder}/crossval/test_{i}.json")
-        prompts = [f"{instruction} '''{text}'''" for text in test[text_column]]
-        outputs = pipe(prompts, batch_size=4)
+        prompts = ProgressDataset([f"{instruction} '''{text}'''" for text in test[text_column]])
+        outputs = pipe(prompts, batch_size=batch_size)
         pred_finder = re.compile("0|1")
         preds = []
         for output in tqdm(outputs):

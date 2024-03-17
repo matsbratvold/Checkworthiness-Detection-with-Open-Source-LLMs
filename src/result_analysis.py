@@ -3,8 +3,8 @@ including exploration of false positives and false negatives"""
 
 from typing import Iterable
 import pandas as pd
-from llm import HuggingFaceModel
 import os
+import enum
 
 def flatten_classification_report(report: dict, drop_support_columns = True) -> dict:
     """Flattens a classification report generated from sklearn"""
@@ -25,7 +25,7 @@ def print_padded_text(text: str, total_length = 50):
 
 def generate_error_analysis_report(
     results: Iterable[pd.DataFrame],
-    models: Iterable[HuggingFaceModel],
+    models: Iterable[enum.Enum],
     folder_path: str = None,
     label_column_name = "Verdict",
     text_column_name = "Text",
