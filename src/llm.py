@@ -109,6 +109,9 @@ def generate_llm_predictions(
     pipe: Pipeline,
     save_path: str,
     batch_size=128,
+    label_column="Verdict",
+    text_column="Text",
+    
 ):
     """Generate a set of predictions using an LLM"""
     prompts_data = ProgressDataset(prompts)
@@ -126,7 +129,7 @@ def generate_llm_predictions(
             parsed_json = json.loads(dict_matcher.search(response).group(0))
             dataset_with_scores.loc[dataset_index, "score"] = parsed_json["score"]
             dataset_with_scores.loc[dataset_index, "reasoning"] = parsed_json["reasoning"]
-        except (json.decoder.JSONDecodeError, AttributeError, KeyError) as e:
+        except (json.decoder.JSONDecodeError, AttributeError, KeyError, ValueError) as e:
             score = score_matcher.search(response)
             if score is not None:
                 score = score[2]
@@ -135,7 +138,7 @@ def generate_llm_predictions(
             dataset_with_scores.loc[dataset_index, "score"] = score
             dataset_with_scores.loc[dataset_index, "reasoning"] = response
             continue
-    columns =  ["Verdict", "score", "Text", "reasoning"]
+    columns =  [label_column, "score", text_column, "reasoning"]
     dataset_with_scores = dataset_with_scores[columns]
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     dataset_with_scores.to_csv(save_path, index=True)
