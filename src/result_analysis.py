@@ -42,6 +42,7 @@ def generate_error_analysis_report(
         print("#" * 50)
         print_padded_text(name)
         prediction[label_column_name] = data.loc[prediction.index][label_column_name]
+        prediction[text_column_name] = data.loc[prediction.index][text_column_name]
         false_negatives = prediction[prediction.apply(lambda x: x["prediction"]==0 and x[label_column_name]==1, axis=1)]
         false_positives = prediction[prediction.apply(lambda x: x["prediction"]==1 and x[label_column_name]==0, axis=1)]
         print_padded_text(f"False positives: {len(false_positives)}")
@@ -74,7 +75,7 @@ def generate_error_analysis_report(
             data.rename(columns={"prediction": f"{model_name}_prediction"})
             for data, model_name in zip(filtered_data, model_names)
         ]
-        all_data = pd.concat([*filtered_data, data[text_column_name]], axis=1)
+        all_data = pd.concat(filtered_data, axis=1)
         columns = [
             label_column_name, 
             text_column_name, 
