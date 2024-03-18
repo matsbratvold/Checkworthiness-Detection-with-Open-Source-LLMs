@@ -17,7 +17,7 @@ from peft import AutoPeftModelForCausalLM, LoraConfig
 import enum
 import torch
 import pandas as pd
-from typing import List, Union
+from typing import List, Tuple, Union
 import os
 import json
 import re
@@ -79,10 +79,11 @@ def run_llm_cross_validation(
     n_splits=4,
     label_column="Verdict",
     save_folder=None,
-) -> pd.DataFrame:
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Run cross validation. Assumes that the predictions have already been
     generated trough the llm jupyter notebook"""
     reports = []
+    predictions = pd.DataFrame(index=pd.Series(name=data.index.name))
     for i in range(n_splits):
         train = pd.read_json(f"{crossval_folder}/train_{i}.json")
         test = pd.read_json(f"{crossval_folder}/test_{i}.json")
@@ -91,6 +92,8 @@ def run_llm_cross_validation(
         optimizer.fit(train_data, None)
         test_data = data[data.index.isin(test[data.index.name].values)]
         preds = optimizer.predict(test_data)
+        for index, pred in enumerate(preds):
+            predictions.loc[test[data.index.name][index], "prediction"] = pred
         report = flatten_classification_report(
             classification_report(test_data[label_column], preds, output_dict=True)
         )
@@ -100,7 +103,8 @@ def run_llm_cross_validation(
     if save_folder is not None:
         os.makedirs(save_folder, exist_ok=True)
         result.to_csv(f"{save_folder}/crossval.csv")
-    return result
+        predictions.to_csv(f"{save_folder}/predictions.csv")
+    return result, predictions
 
     
 def generate_llm_predictions(
