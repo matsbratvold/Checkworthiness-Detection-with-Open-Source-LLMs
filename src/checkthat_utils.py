@@ -44,9 +44,9 @@ def load_check_that_dataset(
     return [train, test]
 
 def main():
-    folder_path = "data/CheckThat2021Task1a"
+    folder_path = "data/CheckThat"
     data = load_check_that_dataset(folder_path)
-    output_path = "data/CheckThat2021Task1a/lora.json"
+    output_path = "data/CheckThat/lora.json"
     with open("prompts/CheckThat/standard/zero-shot-lora.txt") as f:
         instruction = f.read().replace("\n", " ").strip()
     print(data.columns)

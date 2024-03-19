@@ -45,6 +45,16 @@ class HuggingFaceModel(enum.Enum):
     MISTRAL_7B_INSTRUCT = "mistralai/Mistral-7B-Instruct-v0.2"
     MIXTRAL_INSTRUCT = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 
+class PromptType(enum.Enum):
+
+    STANDARD = "standard"
+    CHAIN_OF_THOUGHT = "CoT"
+
+class ICLUsage(enum.Enum):
+
+    ZERO_SHOT = "zeroshot"
+    FEW_SHOT = "fewshot"
+
 
 class ThresholdOptimizer(BaseEstimator, TransformerMixin):
     """Optimizing the threshold value (0-100) to separate check-worthy
@@ -223,7 +233,7 @@ def main():
     with open("prompts/ClaimBuster/standard/zero-shot.txt", "r") as f:
         instruction = f.read()
 
-    data = load_claimbuster_dataset("data/ClaimBuster_Datasets/datasets")
+    data = load_claimbuster_dataset("data/ClaimBuster/datasets")
     texts = data["Text"]
     prompts = [f"{instruction} '''{text}'''" for text in texts]
     print(prompts.__getitem__(0))

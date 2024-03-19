@@ -124,7 +124,7 @@ def output_to_pred(output, regex_finder):
 def main():
     dataset = Dataset.CHECK_THAT
     already_finetuned = True
-    folder="data/ClaimBuster_Datasets" if dataset == Dataset.CLAIMBUSTER else "data/CheckThat2021Task1a"
+    folder="data/ClaimBuster" if dataset == Dataset.CLAIMBUSTER else "data/CheckThat"
     with open(f"prompts/{dataset.value}/standard/zero-shot-lora.txt") as f:
         instruction = f.read().replace("\n", " ").strip()
     label_column = "Verdict" if dataset == Dataset.CLAIMBUSTER else "check_worthiness"

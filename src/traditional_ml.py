@@ -228,7 +228,7 @@ def main():
             ("predictor", classifier),
         ]
     )
-    data = load_check_that_dataset("data/CheckThat2021Task1a")[
+    data = load_check_that_dataset("data/CheckThat")[
         [text_column, label_column]
     ]
     data = pos_extractor.transform(data)

@@ -148,9 +148,9 @@ class ClaimBusterContextualFeatureExtractor:
 
 
 def main():
-    folder_path = os.path.join("data", "ClaimBuster_Datasets/datasets")
+    folder_path = os.path.join("data", "ClaimBuster/datasets")
     data = load_claimbuster_dataset(folder_path)
-    output_path = "data/ClaimBuster_Datasets/datasets/lora.json"
+    output_path = "data/ClaimBuster/datasets/lora.json"
     with open("prompts/ClaimBuster/standard/zero-shot-lora.txt") as f:
         instruction = f.read().replace("\n", " ").strip()
     lora = convert_to_lora_dataset(
