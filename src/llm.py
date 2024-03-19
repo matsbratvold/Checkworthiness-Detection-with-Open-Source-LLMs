@@ -138,6 +138,7 @@ def generate_llm_predictions(
     responses = pipe(prompts_data, batch_size=batch_size)
     for index, result in enumerate(tqdm(responses, total=len(prompts))):
         response = result[0]["generated_text"].replace("\n", "")
+        dataset_with_scores.loc[data.index[index], "raw_response"] = response 
         dataset_index = data.index[index]
         try:
             parsed_json = json.loads(dict_matcher.search(response).group(0))
@@ -150,9 +151,9 @@ def generate_llm_predictions(
             else:
                 score = 0.0 if non_check_worthy_matcher.search(response) else np.nan
             dataset_with_scores.loc[dataset_index, "score"] = score
-            dataset_with_scores.loc[dataset_index, "reasoning"] = response
+            dataset_with_scores.loc[dataset_index, "reasoning"] = None
             continue
-    columns =  [label_column, "score", text_column, "reasoning"]
+    columns =  [label_column, "score", text_column, "reasoning", "raw_response"]
     dataset_with_scores = dataset_with_scores[columns]
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     dataset_with_scores.to_csv(save_path, index=True)
