@@ -77,6 +77,7 @@ class ThresholdOptimizer(BaseEstimator, TransformerMixin):
         self.threshold = max(
             reports, key=lambda report: report["macro avg"]["f1-score"]
         )["threshold"]
+        print(f"{self.threshold=}")
 
     def predict(self, x: pd.DataFrame):
         predictions = x["score"].map(lambda x: 1 if x >= self.threshold else 0)
@@ -135,7 +136,7 @@ def generate_llm_predictions(
     non_check_worthy_matcher = re.compile(
         r"(non-checkworthy)|(not check-worthy)|(non check-worthy)"
     )
-    responses = pipe(prompts_data, batch_size=batch_size)
+    responses = pipe(prompts_data, batch_size=batch_size, do_sample=True, temperature=0.7)
     for index, result in enumerate(tqdm(responses, total=len(prompts))):
         response = result[0]["generated_text"].replace("\n", "")
         dataset_with_scores.loc[data.index[index], "raw_response"] = response 
@@ -192,6 +193,7 @@ def load_huggingface_model(
     tokenizer = AutoTokenizer.from_pretrained(model_id.value)
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = "left"
+    print(f"{max_new_tokens=}")
     pipe = pipeline(
         "text-generation",
         model=model,

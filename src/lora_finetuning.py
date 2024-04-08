@@ -116,16 +116,16 @@ def output_to_pred(output, regex_finder):
     pred = regex_finder.search(text)
     if pred:
         return int(pred[0])
-    return -1
+    return 0
 
 
 
 
 def main():
-    dataset = Dataset.CHECK_THAT
+    dataset = Dataset.CLAIMBUSTER
     already_finetuned = True
     folder="data/ClaimBuster" if dataset == Dataset.CLAIMBUSTER else "data/CheckThat"
-    with open(f"prompts/{dataset.value}/standard/zero-shot-lora.txt") as f:
+    with open(f"prompts/{dataset.value}/standard/zeroshot/instruction-lora.txt") as f:
         instruction = f.read().replace("\n", " ").strip()
     label_column = "Verdict" if dataset == Dataset.CLAIMBUSTER else "check_worthiness"
     text_column = "Text" if dataset == Dataset.CLAIMBUSTER else "tweet_text"
@@ -137,7 +137,7 @@ def main():
     reports = []
     predictions = pd.DataFrame(index=pd.Index([], name=index_col))
     for i in range(4):
-        lora_path = f"models/checkthat_crossval{i}/final_checkpoint"
+        lora_path = f"models/{dataset.value}_crossval{i}/final_checkpoint"
         pipe = load_huggingface_model(
             model_id,
             lora_path=lora_path if already_finetuned else None
@@ -154,7 +154,7 @@ def main():
             run_training(pipe=pipe, run_name=f"claimbuster_crossval{i}", train_data=train_data) 
         print(f"Starting inference on test set for fold {i}")
         test = pd.read_json(f"{folder}/crossval/test_{i}.json")
-        prompts = ProgressDataset([f"{instruction} '''{text}'''" for text in test[text_column]])
+        prompts = ProgressDataset([f"[INST]{instruction} '''{text}'''[/INST]" for text in test[text_column]])
         outputs = pipe(prompts, batch_size=batch_size)
         pred_finder = re.compile("0|1")
         preds = []
