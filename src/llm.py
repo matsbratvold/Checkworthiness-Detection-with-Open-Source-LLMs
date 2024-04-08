@@ -136,7 +136,7 @@ def generate_llm_predictions(
     non_check_worthy_matcher = re.compile(
         r"(non-checkworthy)|(not check-worthy)|(non check-worthy)"
     )
-    responses = pipe(prompts_data, batch_size=batch_size, do_sample=True, temperature=0.7)
+    responses = pipe(prompts_data, batch_size=batch_size)
     for index, result in enumerate(tqdm(responses, total=len(prompts))):
         response = result[0]["generated_text"].replace("\n", "")
         dataset_with_scores.loc[data.index[index], "raw_response"] = response 
