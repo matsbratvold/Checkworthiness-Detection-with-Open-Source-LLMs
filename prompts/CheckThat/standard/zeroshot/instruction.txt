@@ -7,5 +7,5 @@ Additionally, a tweet is only check-worthy if you think that a professional fact
 should verify the claim in the tweet. 
 This implies that the tweet appears to contain false information, it could have an impact on 
 the general public, and the tweet could be harmful to the society, certain people, companies or products.
-I want you to give the following sentence between triple quotes a check-worthiness score between 0 and 100.
+I want you to give the following tweet between triple quotes a check-worthiness score between 0 and 100.
 Answer using the following json format: {"score": [0-100], "reasoning": str}
