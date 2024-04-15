@@ -44,6 +44,7 @@ DEFAULT_LORA_CONFIG = LoraConfig(
 class HuggingFaceModel(enum.Enum):
     MISTRAL_7B_INSTRUCT = "mistralai/Mistral-7B-Instruct-v0.2"
     MIXTRAL_INSTRUCT = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+    LLAMA2_7B_CHAT = "meta-llama/Llama-2-7b-chat-hf"
 
 class PromptType(enum.Enum):
 

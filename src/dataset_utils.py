@@ -6,7 +6,7 @@ import os
 from sklearn.model_selection import StratifiedKFold
 import torch
 
-class Dataset(enum.Enum):
+class CustomDataset(enum.Enum):
     CLAIMBUSTER = "ClaimBuster"
     CHECK_THAT = "CheckThat"
 
