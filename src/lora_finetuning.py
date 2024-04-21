@@ -10,6 +10,8 @@ import pandas as pd
 from datasets import Dataset
 from llm import load_huggingface_model, HuggingFaceModel
 from dataset_utils import convert_to_lora_dataset, CustomDataset, ProgressDataset
+from claimbuster_utils import load_claimbuster_dataset
+from liar_utils import load_liar_dataset
 import re
 from result_analysis import flatten_classification_report
 from tqdm.auto import tqdm
@@ -118,11 +120,46 @@ def output_to_pred(output, regex_finder):
         return int(pred[0])
     return 0
 
+def run_truthfulness_experiment(model_id: HuggingFaceModel=HuggingFaceModel.MISTRAL_7B_INSTRUCT):
+    """Runs experiment E5 where a model is fine-tuned on the whole ClaimBuster 
+    dataset and is used to assess the check-wortiness of claims from the LIAR dataset."""
 
+    claimbuster = load_claimbuster_dataset("data/ClaimBuster/datasets")
+    with open(f"prompts/ClaimBuster/standard/zeroshot/instruction-lora.txt") as f:
+        instruction = f.read().replace("\n", " ").strip()
+                                           
+    train_data = convert_to_lora_dataset(claimbuster, instruction=instruction)
+    run_name = "ClaimBuster_full"
+    model_already_finetuned = os.path.exists(f"models/{run_name}") 
+    lora_path = run_name if model_already_finetuned else None
+    lora_path = None if model_already_finetuned else None
+    pipe = load_huggingface_model(model_id, lora_path=lora_path, max_new_tokens=64)
+    if not model_already_finetuned:
+        print("Training model on whole ClaimBuster dataset")
+        run_training(pipe, run_name, train_data, DEFAULT_TRAINING_ARGS)
+    else:
+        print("Model already trained")
+
+    liar = load_liar_dataset()
+    model_inputs = ProgressDataset([
+        f"[INST]{instruction} '''{text}'''[/INST]" for text in liar["statement"]
+    ])
+    
+    print("Generating checkworthiness predictions on LIAR dataset")
+    pred_finder = re.compile("0|1")
+    outputs = pipe(model_inputs, batch_size=32)
+    for index, output in enumerate(tqdm(outputs)):
+        pred = output_to_pred(output, pred_finder)
+        dataset_index = liar.index.values[index]
+        liar.loc[dataset_index, "check_worthiness"] = pred
+    os.makedirs("results/LIAR", exist_ok=True)
+    liar.to_csv("results/LIAR/checkworthiness.csv", index=True)
 
 
 def main():
-    dataset = CustomDataset.CHECK_THAT
+    run_truthfulness_experiment()
+    return
+    dataset = CustomDataset.CLAIMBUSTER
     model_id = HuggingFaceModel.LLAMA2_7B_CHAT
     folder="data/ClaimBuster" if dataset == CustomDataset.CLAIMBUSTER else "data/CheckThat"
     with open(f"prompts/{dataset.value}/standard/zeroshot/instruction-lora.txt") as f:
@@ -160,7 +197,6 @@ def main():
         pred_finder = re.compile("0|1")
         preds = []
         for index, output in enumerate(tqdm(outputs)):
-            print(output)
             pred = output_to_pred(output, pred_finder)
             preds.append(pred)
             dataset_index = test[index_col].values[index]
