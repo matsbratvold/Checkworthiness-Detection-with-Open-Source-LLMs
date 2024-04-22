@@ -14,6 +14,17 @@ class LIARLabel(Enum):
     MOSTLY_TRUE = 4
     TRUE = 5
 
+def label_to_name(label: LIARLabel):
+    label_to_name = {
+        LIARLabel.PANTS_FIRE: "Pants on fire",
+        LIARLabel.FALSE: "False",
+        LIARLabel.BARELY_TRUE: "Barely true",
+        LIARLabel.HALF_TRUE: "Half true",
+        LIARLabel.MOSTLY_TRUE: "Mostly true",
+        LIARLabel.TRUE: "True"
+    }
+    return label_to_name[label]
+
 LABEL_MAP = {
     "pants-fire": LIARLabel.PANTS_FIRE,
     "false": LIARLabel.FALSE,

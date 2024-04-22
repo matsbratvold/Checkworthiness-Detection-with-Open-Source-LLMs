@@ -9,6 +9,7 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 import stopwords
+import seaborn as sns
 
 
 def dataframe_to_text(data: pd.DataFrame, labels: List[str]):
@@ -31,7 +32,7 @@ def show_word_cloud(text: str, title: str, file_path: str = None):
     file_path: str (default = None)
         The file path to save the plot
     """
-    exists = os.path.exists(file_path)
+    exists = os.path.exists(file_path if file_path is not None else '')
     if exists:
         word_cloud = plt.imread(file_path)
     else:
@@ -56,8 +57,12 @@ def show_bar_plot(
     y: Iterable,
     xlabel: str = None,
     ylabel: str = None,
+    x_ticks: List = None,
+    y_ticks: List = None,
     file_path: str = None,
     force_save = False,
+    horizontal_bars = False,
+    use_bar_labels = False,
 ):
     """Shows a simple bar plot
 
@@ -74,13 +79,27 @@ def show_bar_plot(
     file_path: str (default = None)
         The file path to save the plot
     """
-    plt.bar(x, y)
-    if xlabel is not None:
-        plt.xlabel(xlabel)
-    if ylabel is not None:
-        plt.ylabel(ylabel)
+    sns.set_theme()
+    if horizontal_bars:
+        bar = plt.barh(x, y)
+    else:
+        bar = sns.barplot(
+            x=xlabel, 
+            y=ylabel, 
+            data={xlabel: x, ylabel: y}, 
+            # palette="tab10",
+            hue=xlabel,
+            legend=False
+        )
+    # if x_ticks is not None:
+    #     plt.xticks(x_ticks)
+    # if y_ticks is not None:
+    #     plt.yticks(y_ticks)
+    if use_bar_labels:
+        for containers in bar.containers:
+            bar.bar_label(containers, fmt='%.2f')
     if should_save(file_path, force_save):
-        plt.savefig(file_path)
+        plt.savefig(file_path, bbox_inches="tight")
     plt.show()
 
 def show_histogram_plot(
