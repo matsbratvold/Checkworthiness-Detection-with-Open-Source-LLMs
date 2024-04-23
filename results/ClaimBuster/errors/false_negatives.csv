@@ -1,273 +1,57 @@
-sentence_id,Verdict,Text,MISTRAL_7B_INSTRUCT_prediction,MIXTRAL_INSTRUCT_prediction,LORA_prediction
-14952,1,We've had the Central Accounting.,0.0,0.0,0.0
-30363,1,I said she doesn't have the stamina.,0.0,0.0,0.0
-11708,1,That would be an abrogation of our agreement with NATO.,0.0,0.0,0.0
-24938,1,"I was very interested to hear about Central America and our process down there, and I thought for a moment that instead of a debate I was going to find Mr. Mondale in complete agreement with what we're doing, because the plan that he has outlined is the one we've been following for quite some time, including diplomatic processes throughout Central America and working closely with the Contadora group.",0.0,0.0,0.0
-27454,1,You're seeing it right now in the economy.,0.0,0.0,0.0
-13106,1,"I will say this: in the event that such an attack occurred and in the event the attack was a prelude to an attack on Formosa - which would be the indication today because the Chinese Communists say over and over again that their objective is not the offshore islands, that they consider them only steppingstones to taking Formosa - in the event that their attack then were a prelude to an attack on Formosa, there isn't any question but that the United States would then again, as in the case of Berlin, honor our treaty obligations and stand by our ally of Formosa.",0.0,0.0,0.0
-1591,1,It used to be that the average - uh family could own a house.,0.0,0.0,0.0
-32437,1,I have no loans from Russia.,0.0,0.0,0.0
-5730,1,"Even FOX News disputes it, and that doesn't happen very often when it comes to accusations about me.",0.0,0.0,0.0
-25195,1,"The Soviet Union, to our surprise -- and not just mine -- made it plain when we brought this up that they placed, they thought, a greater reliance on the land-based missiles and, therefore, they wanted to take up all three.",0.0,0.0,0.0
-106,1,"And let me lay out for you my own strategy for bring that deficit down, because as a chief executive that's balanced ten budgets in a row, I've had to make those tough decisions and those tough choices.",0.0,0.0,0.0
-228,1,I think we have to demonstrate some flexibility and I think the FDA is attempting to do so now in trying to make it possible for new and experimental drugs to be available to people who are at risk at AIDS and I would hope that we could bring that kind of a policy to bear beginning in January.,0.0,0.0,0.0
-34042,1,"It's crooked -- she's -- she's guilty of a very, very serious crime.",0.0,0.0,0.0
-7791,1,"And if India should lose her battle, with thirty-five per cent of the people of the underdeveloped world within her borders, then I believe that the balance of power could move against us.",0.0,0.0,0.0
-2943,1,I believe that we have uh - negotiated with the Soviet Union since I've been president from a position of strength.,0.0,0.0,0.0
-2217,1,They'll have at least two plans.,0.0,0.0,0.0
-27956,1,And we're retaining our workers for the jobs of tomorrow.,0.0,0.0,0.0
-16014,1,I learned that the hard way and the Governor and I both supported slipping the COLAs for one year.,0.0,0.0,0.0
-12695,1,We are quarantining Mr. Castro today.,0.0,0.0,0.0
-24439,1,"I urged the president to support this air cover, and he did--and I applaud that.",0.0,0.0,0.0
-32440,1,But I have no loans with Russia.,0.0,0.0,0.0
-13953,1,And it's true on this and it's true on CAFE.,0.0,0.0,0.0
-3666,1,And that's just a fact.,0.0,0.0,0.0
-10708,1,I first proposed a long time ago that we would have to examine every agency and every bureaucracy of government.,0.0,0.0,0.0
-7846,1,I cannot still understand why this Administration and Mr. Nixon oppose putting medical care for the aged under Social Security to give them some security.,0.0,0.0,0.0
-15625,1,"Margaret, may I go back and just say to the vice president that I didn't raid the pension fund of Massachusetts you are dead wrong, George, we didn't do that.",0.0,0.0,0.0
-6908,1,"I think they'll choose it, because it's a net plus of $5 billion to them.",0.0,0.0,0.0
-15398,1,We're now working on the communications industry.,0.0,0.0,0.0
-12220,1,And they have not got it done.,0.0,0.0,0.0
-11034,1,"And I am convinced that my record, going back to my opposition from sending the Marines to Lebanon, to supporting our efforts in Kosovo and Bosnia and the first Gulf War, and my judgment, I think, is something that I'm -- a record that I'm willing to stand on.",0.0,0.0,0.0
-10648,1,"And I've been supporting those and I know how to fix this economy, and eliminate our dependence on foreign oil, and stop sending $700 billion a year overseas.",0.0,0.0,0.0
-8872,1,"I'm happy to say that, in contrast to that, the Anderson-Lucey platform for America, program for the 80s, has devoted considerable time, and in very specific detail, we have talked about two things that ought to be done to aid urban America.",0.0,0.0,0.0
-20530,1,I said I would make sure that women would be safe who used the drug.,0.0,0.0,0.0
-13693,1,"Now look, he says Arkansas's a poor state.",0.0,0.0,0.0
-7159,1,"The No Child Left Behind Act says, ""We'll raise standards.",0.0,0.0,0.0
-23820,1,I think the principal that separates me is that 5 and a half million people came together on their own and put me on the ballot.,0.0,0.0,0.0
-13963,1,"You know, Mr. Bush was very grateful when I was among the Democrats who said he ought to have the authority to negotiate an agreement with Mexico.",0.0,0.0,0.0
-10523,1,"Well, thank you, Oliver, and that's an excellent question, because as you just described it, bailout, when I believe that it's rescue, because -- because of the greed and excess in Washington and Wall Street, Main Street was paying a very heavy price, and we know that.",0.0,0.0,0.0
-7693,1,I do not believe that this Administration has implemented those bills which represent the will of the majority of the Congress on two occasions with vigor.,0.0,0.0,0.0
-13192,1,"That is why I think the Senate was right, including a majority of the Democrats, a majority of the Republicans, when they rejected Senator Kennedy's position in 1955.",0.0,0.0,0.0
-16463,1,"It would've called for export controls on agricultural products In my judgment the best way to get jobs is to uh - expand the private sector, where five out of six jobs today exist in our economy.",0.0,0.0,0.0
-3710,1,We now have defense systems that the costs are completely out of control.,0.0,0.0,0.0
-14314,1,And we got some very good Republican women running.,0.0,0.0,0.0
-822,1,"He says, Ã¢â€°Â¥Well, let's concede that the administration has been doing business with Noriega.",0.0,0.0,0.0
-24411,1,"I am going to stand by and use the moral persuasion of the US to get satisfaction in terms of prison camps, and we're making some progress there, and in terms of getting humanitarian relief in there.",0.0,0.0,0.0
-11012,1,"Everybody goes to Delaware, because they've got very -- pretty loose laws when it comes to things like credit cards.",0.0,0.0,0.0
-14387,1,And the only difference between me and any other businessman that has the range of businesses that I have is I haven't had that many lawsuits.,0.0,0.0,0.0
-32599,1,I worked very hard and was very proud to be re-elected in New York by an even bigger margin than I had been elected the first time.,0.0,0.0,0.0
-14955,1,I'm confident that it can be done and that it will reduce inflation because I did it in California.,0.0,0.0,0.0
-21847,1,He can buy insurance cheaper than Mom and Pop's store on the corner.,0.0,0.0,0.0
-2952,1,"In the case of Helsinki, thirty-five nations signed an agreement, including the secretary of state for the Vatican - I can't under any circumstances believe that the - His Holiness, the Pope would agree by signing that agreement that the thirty-five nations have turned over to the Warsaw Pact nations the domination of the - Eastern Europe.",0.0,0.0,0.0
-16499,1,"Well, Mr. Ford is - is uh changing uh considerably his previous philosophy.",0.0,0.0,0.0
-6952,1,We're aligning facilities where the veterans live now.,0.0,0.0,0.0
-27366,1,It's not driven by politics.,0.0,0.0,0.0
-8874,1,"I was in North Pittsburgh - I think it was a few weeks ago, on my campaign - the water mains in that city had begun to leak, and literally, there wasn't money available to fix them.",0.0,0.0,0.0
-2489,1,Let me just point out first of all this board that we're talking about can't make decisions about what treatments are given.,0.0,0.0,0.0
-15459,1,"I have not had the experience the President has had in holding that office, but I think in being Governor of California, the most populous state in the Union - if it were a nation, it would be the seventh-ranking economic power in the world - I, too, had some lonely moments and decisions to make.",0.0,0.0,0.0
-3998,1,"And as a consequence, we lost legitimacy in Pakistan.",0.0,0.0,0.0
-26259,1,I have never supported quotas.,0.0,0.0,0.0
-8375,1,"And therefore I've never suggested we should uh - be able to retire the debt substantially, or even at all in nineteen sixty-one or two.",0.0,0.0,0.0
-33446,1,We've never had anything like this happen in any of our elections before.,0.0,0.0,0.0
-24294,1,That's pennies on the dollar compared to renewing the cold war.,0.0,0.0,0.0
-6048,1,"We've got to do both, and that's exactly what my plan does.",0.0,0.0,0.0
-33200,1,"And the court didn't accept that reasonable regulation, but they've accepted many others.",0.0,0.0,0.0
-29511,1,"But you will learn more about Donald Trump by going down to the federal elections, where I filed a 104-page essentially financial statement of sorts, the forms that they have.",0.0,0.0,0.0
-3154,1,Mr. Ford hasn't moved on this.,0.0,0.0,0.0
-18096,1,"As a matter of fact, this is a global effort.",0.0,0.0,0.0
-2612,1,"You know, this is where budgets matter, because budgets reflect choices.",0.0,0.0,0.0
-24500,1,"Our funding for recovery is up, recovering the addicts.",0.0,0.0,0.0
-26073,1,I started working on welfare reform in 1980 because I was sick of seeing people trapped in a system that was increasingly isolating them and making their kids more vulnerable to get in trouble.,0.0,0.0,0.0
-22887,1,"It works when we make sure they've got housing, like we have done in the last military budgets.",0.0,0.0,0.0
-22891,1,And by that I mean we're moving troops out of Korea and replacing them with more effective weapons.,0.0,0.0,0.0
-12698,1,"By cutting off trade, by cutting off our diplomatic relations as we have, we will quarantine this regime so that the people of Cuba themselves will take care of Mr. Castro.",0.0,0.0,0.0
-13012,1,There are only three left.,0.0,0.0,0.0
-7746,1,"Every time the United States has been an one side and they've been on the other side, our position has been sustained.",0.0,0.0,0.0
-25882,1,"I mean, we've cut defense spending too much in the first place.",0.0,0.0,0.0
-29965,1,"Because I settled that lawsuit with no admission of guilt, but that was a lawsuit brought against many real estate firms, and it's just one of those things.",0.0,0.0,0.0
-12014,1,There's a lot of talk about trigger locks being on guns sold in the future.,0.0,0.0,0.0
-34131,1,"He violated the red line in the sand, and he made so many mistakes, made all the mistakes.",0.0,0.0,0.0
-6977,1,"But I want to warn my fellow citizens: The cost of doing nothing, the cost of saying the current system is OK, far exceeds the costs of trying to make sure we save the system for our children.",0.0,0.0,0.0
-1086,1,"But to add one other feature, I don't control any of the tapes.",0.0,0.0,0.0
-23352,1,That's why I proposed a hydrogen automobile -- hydrogen-generated automobile.,0.0,0.0,0.0
-5608,1,"Well, first of all, I think it's important for the American public to understand that the $750 billion rescue package, if it's structured properly, and, as president, I will make sure it's structured properly, means that ultimately taxpayers get their money back, and that's important to understand.",0.0,0.0,0.0
-32764,1,"I do think the use of special forces, which we're using, the use of enablers and trainers in Iraq, which has had some positive effects, are very much in our interests, and so I do support what is happening, but let me just...",0.0,0.0,0.0
-19660,1,"If you change your job, you're going to be covered.",0.0,0.0,0.0
-7309,1,And I'd have taken it out to the country and I'd have had every law enforcement officer in the country visit those congressmen.,0.0,0.0,0.0
-26613,1,In 1983 we thought we had a 75 -year fix.,0.0,0.0,0.0
-27551,1,"And when I went to Israel as a candidate, I didn't take donors.",0.0,0.0,0.0
-14673,1,I'm totally focussed on the fact that we are still evading the issue of the Glaspie papers.,0.0,0.0,0.0
-29502,1,The Fed is doing political -- by keeping the interest rates at this level.,0.0,0.0,0.0
-4038,1,"At one point, while you were focused on Iraq, you said well, we can ""muddle through"" Afghanistan.",0.0,0.0,0.0
-15093,1,I have been accused lately of having a secret plan with regard to the hostages.,0.0,0.0,0.0
-28944,1,"And, you know, we've heard a lot about -- from the governor about not much being done in the last eight years, as if the promises that I made eight years ago have not been kept.",0.0,0.0,0.0
-14473,1,"Now, you and I never got a ride on a lot of these yachts and fancy things it bought, but you and I are paying for it.",0.0,0.0,0.0
-16154,1,"We ought to move forward swiftly on my ideas of ethanol which would use more corn, and therefore, create a bigger market for our agricultural products.",0.0,0.0,0.0
-23456,1,"Ladies and gentlemen, that's just not true what he said.",0.0,0.0,0.0
-27122,1,"But look, this has been going on for a year.",0.0,0.0,0.0
-16701,1,But the energy - uh policy of our nation is one that uh has not yet been established under this administration.,0.0,0.0,0.0
-25503,1,"And, as a matter of fact, the previous administration stood by and so did I -- not that I could have done anything in my position at that time -- but for this revolution to take place.",0.0,0.0,0.0
-29695,1,"So I have, ever since the first day of my campaign, called for criminal justice reform.",0.0,0.0,0.0
-12712,1,His influence is growing - mostly because this Administration has ignored Latin America.,0.0,0.0,0.0
-33223,1,"But we're going to do it in a way that tries to save some of these 33,000 lives that we lose every year.",0.0,0.0,0.0
-23332,1,They don't name him the most liberal in the United States Senate because he hasn't shown up to many meetings.,0.0,0.0,0.0
-24335,1,"I mean, that's been done.",0.0,0.0,0.0
-13340,1,I have suggested that the president should be given other weapons to protect the national interest in case of national emergency strikes beyond the injunction provision of the Taft-Hartley Act.,0.0,0.0,0.0
-13184,1,"As I uh - related a moment ago, the President has always indicated that we must not make the mistake in dealing with the dictator of indicating that we are going to make a concession at the point of a gun.",0.0,0.0,0.0
-13772,1,"I've spoken out over and over again against antisemitism and racism, and I think my record as a member of Congress speaks for itself on that.",0.0,0.0,0.0
-21450,1,"I'm spending my money -- not PAC money, not foreign money, my money -- to take this message to the people.",0.0,0.0,0.0
-3726,1,That is a multi-year project.,0.0,0.0,0.0
-3564,1,"And he's also right that oftentimes lobbyists and special interests are the ones that are introducing these kinds of requests, although that wasn't the case with me.",0.0,0.0,0.0
-33386,1,"I voted for border security, and there are...",0.0,0.0,0.0
-2432,1,"They put out a plan, a bipartisan plan.",0.0,0.0,0.0
-1343,1,The record just doesn't prove that such legislation or action by a local city council is effective.,0.0,0.0,0.0
-25537,1,Mr. Mondale has recently announced a plan of his to get the democracies together and to work with the whole world to turn to democracy.,0.0,0.0,0.0
-8688,1,"I believe we need incentive for the individual, and for business and industry, and I believe the plan that I have submitted, with detailed backing, and which has been approved by a number of our leading economists in the country, is based on projections.",0.0,0.0,0.0
-730,1,That is my position on SDI and it's never wavered a bit.,0.0,0.0,0.0
-27440,1,So the work that we've done with respect to sanctions now offers Iran a choice.,0.0,0.0,0.0
-3958,1,"So I'm not prepared to threaten it, as Senator Obama apparently wants to do, as he has said that he would announce military strikes into Pakistan.",0.0,0.0,0.0
-20230,1,"And that stands in contrast to my worthy opponent's plan, which will increase the size of government dramatically.",0.0,0.0,0.0
-23329,1,"I mean, these aren't make-up figures.",0.0,0.0,0.0
-30233,1,"He even said, well, you know, if there were nuclear war in East Asia, well, you know, that's fine...",0.0,0.0,0.0
-22188,1,And it works- -it works in Milwaukee.,0.0,0.0,0.0
-29223,1,"I could name, I mean, there are thousands of them.",0.0,0.0,0.0
-6870,1,He has no record on reforming of health care.,0.0,0.0,0.0
-5568,1,"The whole premise behind Senator Obama's plans are class warfare, let's spread the wealth around.",0.0,0.0,0.0
-5703,1,They're doing it all over America because they have to.,0.0,0.0,0.0
-19715,1,"The bottom line is, we went in there alone.",0.0,0.0,0.0
-14256,1,And in 12 years as governor I guess I've taken on every interest group there was in my state at one time or another to fight for change.,0.0,0.0,0.0
-15117,1,I didn't hear any comment from Governor Reagan about what he would do to stop or reduce terrorism in the future.,0.0,0.0,0.0
-33412,1,"Very unfair that somebody runs across the border, becomes a citizen, under her plan, you have open borders.",0.0,0.0,0.0
-27592,1,"In the same way that you initially opposed a timetable in Afghanistan, now you're for it, although it depends.",0.0,0.0,0.0
-26019,1,"After this year is over, we'll resolve it just as we did with Social Security in `83.",0.0,0.0,0.0
-15209,1,"If you put 50 tons of TNT in each one of railroad cars, you would have a carload of TNT - a trainload of TNT stretching across this nation.",0.0,0.0,0.0
-27811,1,But the president mentioned the auto industry and that somehow I would be in favor of jobs being elsewhere.,0.0,0.0,0.0
-29313,1,But you haven't done it in 30 years or 26 years or any number you want to...,0.0,0.0,0.0
-14474,1,And they buried it till right after the election.,0.0,0.0,0.0
-16024,1,I voted against that at the National Governors Association.,0.0,0.0,0.0
-10130,1,They're using cheap hand guns.,0.0,0.0,0.0
-6748,1,"And if it gets overturned, then we'll end up with marriage being defined by courts, and I don't think that's in our nation's interests.",0.0,0.0,0.0
-1224,1,We have no energy policy.,0.0,0.0,0.0
-19415,1,Even though I have consistently opposed the legalization of drugs all my public life and worked hard against them.,0.0,0.0,0.0
-8976,1,It at the John doesn't quite realize - he's never held an executive position of that kind.,0.0,0.0,0.0
-13925,1,"And I finally -- I thought I didn't understand it -- called all the experts, and they said, oh, it'll be disruptive for 12 to 15 years.",0.0,0.0,0.0
-25509,1,"And what I have to say about this is, many times -- and this has to do with the Philippines, also, I know there are things there in the Philippines that do not look good to us from the standpoint right now of democratic rights, but what is the alternative?",0.0,0.0,0.0
-23414,1,I have a plan to cover those folks.,0.0,0.0,0.0
-465,1,"As I've seen abortions sometimes used as a birth control device, for heavens sakes.",0.0,0.0,0.0
-574,1,"I think it take fresh leadership now, and an understanding of those forces of change to provide the kind of strength that we need, and perhaps the vice president can explain what he was doing when he supported the trading of arms to terrorist nation, and his involvement in Panama and that endorsement of Mr. Macros.",0.0,0.0,0.0
-6786,1,"And as President Kennedy said when he ran for president, he said, ""I'm not running to be a Catholic president.",0.0,0.0,0.0
-16764,1,"In addition, the jobs would not be available right now.",0.0,0.0,0.0
-20466,1,The administration did not deal with it.,0.0,0.0,0.0
-32664,1,She talks in favor of the rebels.,0.0,0.0,0.0
-9018,1,"And I have said freely, all over this country, that it was a mistake for me or anyone to ever try to put the Judeo-Christian heritage of this country, important as it is, and important as my religious faith is to me - it's a very deeply personal matter.",0.0,0.0,0.0
-33022,1,"I think it's such a great question, because energy is under siege by the Obama administration.",0.0,0.0,0.0
-3457,1,"But the point is -- the point is, we have finally seen Republicans and Democrats sitting down and negotiating together and coming up with a package.",0.0,0.0,0.0
-32908,1,"She didn't answer it, because when Ambassador Stevens...",0.0,0.0,0.0
-32350,1,"It's been debunked, but it never stops him from saying whatever he wants to say.",0.0,0.0,0.0
-18240,1,"My opponent at one time said, ""Well, get me elected, I'll have them out of there in six months.""",0.0,0.0,0.0
-25315,1,"Georgie Anne, we, believe me, supported the Simpson-Mazzoli bill strongly -- and the bill that came out of the Senate.",0.0,0.0,0.0
-17550,1,"In my opinion, as we deal with this deficit, people from about $70,000 a year on down have to be dealt with very, very carefully, because they are the ones who didn't get any relief the first time around.",0.0,0.0,0.0
-27084,1,They're willing to work with us.,0.0,0.0,0.0
-27076,1,"And finally, we don't want to have military involvement there.",0.0,0.0,0.0
-4209,1,He doesn't understand that Russia committed serious aggression against Georgia.,0.0,0.0,0.0
-11704,1,But one of the problems we have in the military is we're in a lot of places around the world.,0.0,0.0,0.0
-30174,1,I was against the war.,0.0,0.0,0.0
-2900,1,"And I'm not gonna exclude the American people from that process in the future, as Mr. Ford and Kissinger have done.",0.0,0.0,0.0
-4240,1,I immediately said that this was illegal and objectionable.,0.0,0.0,0.0
-13419,1,The t- man who grows tomatoes - it costs less for those tomatoes than it does for the label on the can.,0.0,0.0,0.0
-23641,1,My opponent was against that.,0.0,0.0,0.0
-23445,1,"Now, he says he's only going to tax the rich.",0.0,0.0,0.0
-19757,1,"I would like to have had a big, organized summit, but those people were killing each other, rapidly, innocent Arab children, innocent Israeli people, they were dying.",0.0,0.0,0.0
-25071,1,"It is true over 10 years ago I voted to delay production of the F - 14, and I'll tell you why.",0.0,0.0,0.0
-31932,1,And many Republicans and independents have said the same thing.,0.0,0.0,0.0
-19848,1,I've supported all the education programs.,0.0,0.0,0.0
-24127,1,So that one we came away with in creating jobs for the American people.,0.0,0.0,0.0
-21629,1,Mr. Perot wants to do the same thing.,0.0,0.0,0.0
-19513,1,"And, I might add, with the democratic Russia.",0.0,0.0,0.0
-22724,1,He talks about a grand idea: Let's have a summit; we're going to solve the problem in Iraq by holding a summit.,0.0,0.0,0.0
-33528,1,"The Russians have said, according to many, many reports, I can't believe they allowed us to do this.",0.0,0.0,0.0
-13602,1,"On this, as on so many other issues, I have a fundamental difference from the present administration.",0.0,0.0,0.0
-8200,1,The same is true of highways.,0.0,0.0,0.0
-28132,1,"Listen, for 24 years I have never been afraid to take on the big drug companies.",0.0,0.0,0.0
-18338,1,"Plus, he says the cornerstone of his plan to succeed in Iraq is to call upon nations to serve.",0.0,0.0,0.0
-33867,1,"And frankly, those stories have been largely debunked.",0.0,0.0,0.0
-14591,1,We are a rising nation.,0.0,0.0,0.0
-14106,1,"On the 2nd debate, I offered, since both sides want the enterprise zones and we can't get together, I said I'll take a few days off and go to Washington and hold hands with you and we'll get it done.",0.0,0.0,0.0
-24928,1,I have ordered an investigation.,0.0,0.0,0.0
-12164,1,And they get health care.,0.0,0.0,0.0
-10854,1,"I traveled all over the world looking at the effects of greenhouse gas emissions, Joe Lieberman and I.",0.0,0.0,0.0
-19434,1,You had a surgeon -- or before General McCaffrey (ph) you had a lady who said we ought to consider legalizing drugs.,0.0,0.0,0.0
-25941,1,They may be danger -- I voted I for everything since that time.,0.0,0.0,0.0
-27535,1,"Iran is at its weakest point, economically, strategically, militarily, then since -- then in many years.",0.0,0.0,0.0
-32536,1,"And so do all of her donors, or most of her donors.",0.0,0.0,0.0
-16778,1,"Well, that bill has not yet come down to the Oval Office, so I am not in a position to make any judgment on it tonight.",0.0,0.0,0.0
-1932,1,"And the amount of debt we're adding, at a trillion a year, is simply not moral.",0.0,0.0,0.0
-24593,1,"But maybe you meant that some in the country don't have the will to fight it, but those that are out there on the front line, as you know -- you've been a strong backer of law enforcement -- really -- I just want to clear that up --have the will to fight it, and, frankly, some of them are giving their lives.",0.0,0.0,0.0
-13966,1,Mr. Perot says it's a bad deal.,0.0,0.0,0.0
-18431,1,We know that he promised America that he was going to build this coalition.,0.0,0.0,0.0
-1049,1,I think the major reason for a decrease in participation that we have experienced ever since 1960 has been the deep discouragement of the American people about the performance of public officials.,0.0,0.0,0.0
-11995,1,Some of the restrictions that have been placed by the Congress in the last couple of years.,0.0,0.0,0.0
-7600,1,In the first place I've never suggested that Cuba was lost except for the present.,0.0,0.0,0.0
-27825,1,"Governor Romney, that's not what you said...",0.0,0.0,0.0
-6829,1,"And therefore, the actual user of health care is not the purchaser of health care.",0.0,0.0,0.0
-13894,1,I have never said we should write it into law if there is evidence that that goal cannot be achieved.,0.0,0.0,0.0
-5514,1,And I pushed for some core principles: making sure that taxpayer can get their money back if they're putting money up.,0.0,0.0,0.0
-12271,1,But it starts with working in a collaborative effort with states and local folks.,0.0,0.0,0.0
-2485,1,"Innermountain Healthcare does it superbly well, Mayo Clinic is doing it superbly well, Cleveland Clinic, others.",0.0,0.0,0.0
-29282,1,"For 30 years, you've been doing it, and now you're just starting to think of solutions.",0.0,0.0,0.0
-6346,1,"But to have a situation, as you mentioned in our earlier comments, that the most expensive education in the world is in the United States of America also means that it cries out for reform, as well.",0.0,0.0,0.0
-22163,1,We can't have any more instances like what happened when Mr. Bush went to Japan and the Japanese prime minister said he felt sympathy for our country.,0.0,0.0,0.0
-27741,1,It's not government investments that makes businesses grow and hire people.,0.0,0.0,0.0
-29326,1,You were totally in favor of it.,0.0,0.0,0.0
-16707,1,The reorganization proposal that I have put forward is one uh first step.,0.0,0.0,0.0
-19387,1,"So I think the American people, including the Perot supporters, know that I have had a consistent record in favor of campaign finance reform, and I will continue to have.",0.0,0.0,0.0
-24377,1,"He says don't do it, but the policies he's expounding of putting conditions on M.F.N.",0.0,0.0,0.0
-19868,1,That's one of the big reasons I vetoed it.,0.0,0.0,0.0
-27673,1,And I -- I don't blame the administration for the fact that the relationship with Pakistan is strained.,0.0,0.0,0.0
-32469,1,"But you wouldn't change it, because all of these people gave you the money so you can take negative ads on Donald Trump.",0.0,0.0,0.0
-13917,1,And I got a long history of doing that.,0.0,0.0,0.0
-1412,1,"The Miranda case, uh - the Burger Court uh - is gradually changing, and I'm pleased to see that there are some steps being made by the uh - Burger Court to modify the so-called Miranda decision.",0.0,0.0,0.0
-14179,1,"But I was wrong because I thought the tax compromise, going along with 1 Democratic tax increase, would help the economy.",0.0,0.0,0.0
-24135,1,"With interest rates down and inflation down, the cruelest tax of all, caught up in a global slowdown right now, that that will change if you go with the programs I've talked about and if you help with job retraining and education.",0.0,0.0,0.0
-14318,1,So we have a long history of having a lot of talented women.,0.0,0.0,0.0
-30160,1,The record does not show that.,0.0,0.0,0.0
-27627,1,So our troops will come home at that point.,0.0,0.0,0.0
-18687,1,"No president, through all of American history, has ever ceded, and nor would I, the right to preempt in any way necessary to protect the United States of America.",0.0,0.0,0.0
-21717,1,I am not for national registration of firearms.,0.0,0.0,0.0
-8124,1,I'm not satisfied to have fifty percent of our steel-mill capacity unused.,0.0,0.0,0.0
-12414,1,"That's going to be up to the people, isn't it?",0.0,0.0,0.0
-20085,1,"Well, I'd say the first homeless bill in the Senate was the Dole-Byrd Byrd-Dole bill, I can't remember who was in control then.",0.0,0.0,0.0
-27176,1,This -- we have weakened our economy.,0.0,0.0,0.0
-20109,1,"I think they're better off, all of us are, that we got the interest rates down and the deficit down.",0.0,0.0,0.0
-2018,1,"Well, the economy is still growing slow.",0.0,0.0,0.0
-6112,1,"He says he's going to give you all a $5,000 tax credit.",0.0,0.0,0.0
-34259,1,"We're giving them lots of money, lots of everything.",0.0,0.0,0.0
-32808,1,But she's lied about a lot of things.,0.0,0.0,0.0
-20839,1,And many of the public schools are meeting the call.,0.0,0.0,0.0
-26961,1,"And, of course, Iran on the path to a nuclear weapon, we've got real (inaudible).",0.0,0.0,0.0
-12251,1,We are a big industrial state.,0.0,0.0,0.0
-24998,1,"Now, they claim they're not.",0.0,0.0,0.0
-15410,1,"But, if we're talking about how much we think about the working people and so forth, I'm the only fellow who ever ran for this job who was six times President of his own union and still has a lifetime membership in that union.",0.0,0.0,0.0
-14933,1,We don't have inflation because the people are living too well.,0.0,0.0,0.0
-34170,1,I guess he believes it makes him look better now to contrast with me because I did vote for it.,0.0,0.0,0.0
-32877,1,And he is supporting me 100 percent.,0.0,0.0,0.0
-32182,1,"In '17, it implodes by itself.",0.0,0.0,0.0
-20107,1,I said that I would work for tax relief for middle class Americans.,0.0,0.0,0.0
-12814,1,"I would say first of all that we must have in mind the fact that we have been negotiating to get tests inspected and uh - to get an agreement for many, many months.",0.0,0.0,0.0
-3132,1,Those gray-area weapons systems are creating some problems in a - the agreement for a SALT II negotiation.,0.0,0.0,0.0
-11208,1,"And once they feel secure, then they lead normal, social, economic, political lives, the same thing that's happening in Iraq today.",0.0,0.0,0.0
-19734,1,I've supported the President when I thought he was right on Bosnia.,0.0,0.0,0.0
-1111,1,I got a- a complete report back from those countries from these two distinguished - uh - gentlemen.,0.0,0.0,0.0
-21384,1,"I'd like to have what 43 governors have -- the line item veto, so if the Congress can't cut, and we've got a reckless spending Congress, let the president have a shot at it by wiping out things that are pork barrel or something of that nature.",0.0,0.0,0.0
-27910,1,That will not help us compete with China.,0.0,0.0,0.0
-14273,1,"Governor Clinton said, well, I might have been with the minority, let sanctions work -- but I guess I would have voted with the majority.",0.0,0.0,0.0
-19551,1,"In Northern Ireland, in the Middle East we are better off than we were four years ago.",0.0,0.0,0.0
-7136,1,We're not allowed to vote on it.,0.0,0.0,0.0
-34006,1,"... because your donors and your special interests are doing the same thing as I do, except even more so.",0.0,0.0,0.0
-14646,1,"And then, Helen, I really believe where people are going to ask this question about trust, because I do think there's a pattern by Governor Clinton of saying one thing to please one group, and then trying to please another group.",0.0,0.0,0.0
-17394,1,I think they also know that we had a commission that came in a year ago with a recommendation on education -- on excellence in education.,0.0,0.0,0.0
-14295,1,"Look at Lynn Martin, who's fighting against this glass ceiling and doing a first-class job on it.",0.0,0.0,0.0
-29041,1,"Highest private home ownership ever, but I'll make you one promise here.",0.0,0.0,0.0
-27057,1,"What we've done is organize the international community, saying Assad has to go.",0.0,0.0,0.0
-12904,1,He says he supports the President's position.,0.0,0.0,0.0
-24995,1,And now we are putting up a defense of our own.,0.0,0.0,0.0
-5550,1,"And we both want to cut taxes, the difference is who we want to cut taxes for.",0.0,0.0,0.0
-30020,1,I don't think anybody knows it was Russia that broke into the DNC.,0.0,0.0,0.0
-3021,1,I think under those circumstances they would refrain from pushing us to our knees as they did in 1973 with their previous oil embargo.,0.0,0.0,0.0
-11000,1,"Number one, let me just repeat, if you've got a health care plan that you like, you can keep it.",0.0,0.0,0.0
-27691,1,We're also going to have to have a farm more effective and comprehensive strategy to help move the world away from terror and Islamic extremism.,0.0,0.0,0.0
-33730,1,"And they actually fact checked, and they said I was right.",0.0,0.0,0.0
-24757,1,"As president I have to be sure that those waivers, which we're approving all over the place, are covered under the law.",0.0,0.0,0.0
-2510,1,And the choices we've made have been ones that ultimately are benefiting middle-class families all across the country.,0.0,0.0,0.0
-27393,1,Now we're changing to one conflict.,0.0,0.0,0.0
+sentence_id,Verdict,Text,MISTRAL_7B_INSTRUCT standard zeroshot_prediction,MISTRAL_7B_INSTRUCT standard fewshot_prediction,MIXTRAL_INSTRUCT standard zeroshot_prediction,MIXTRAL_INSTRUCT standard fewshot_prediction,LLAMA2_7B_CHAT standard zeroshot_prediction,LLAMA2_7B_CHAT standard fewshot_prediction,MISTRAL_7B_INSTRUCT LORA_prediction,LLAMA2_7B_CHAT LORA_prediction
+14952,1,We've had the Central Accounting.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+30363,1,I said she doesn't have the stamina.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+27454,1,You're seeing it right now in the economy.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+13953,1,And it's true on this and it's true on CAFE.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+15398,1,We're now working on the communications industry.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+12220,1,And they have not got it done.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+11034,1,"And I am convinced that my record, going back to my opposition from sending the Marines to Lebanon, to supporting our efforts in Kosovo and Bosnia and the first Gulf War, and my judgment, I think, is something that I'm -- a record that I'm willing to stand on.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+13693,1,"Now look, he says Arkansas's a poor state.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+822,1,"He says, Ã¢â€°Â¥Well, let's concede that the administration has been doing business with Noriega.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+16499,1,"Well, Mr. Ford is - is uh changing uh considerably his previous philosophy.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+27366,1,It's not driven by politics.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+13012,1,There are only three left.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+25882,1,"I mean, we've cut defense spending too much in the first place.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+29965,1,"Because I settled that lawsuit with no admission of guilt, but that was a lawsuit brought against many real estate firms, and it's just one of those things.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+1086,1,"But to add one other feature, I don't control any of the tapes.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+23352,1,That's why I proposed a hydrogen automobile -- hydrogen-generated automobile.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+32764,1,"I do think the use of special forces, which we're using, the use of enablers and trainers in Iraq, which has had some positive effects, are very much in our interests, and so I do support what is happening, but let me just...",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+14673,1,I'm totally focussed on the fact that we are still evading the issue of the Glaspie papers.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+15093,1,I have been accused lately of having a secret plan with regard to the hostages.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+27122,1,"But look, this has been going on for a year.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+24335,1,"I mean, that's been done.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+730,1,That is my position on SDI and it's never wavered a bit.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+22188,1,And it works- -it works in Milwaukee.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+29223,1,"I could name, I mean, there are thousands of them.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+5703,1,They're doing it all over America because they have to.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+19715,1,"The bottom line is, we went in there alone.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+27811,1,But the president mentioned the auto industry and that somehow I would be in favor of jobs being elsewhere.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+8976,1,It at the John doesn't quite realize - he's never held an executive position of that kind.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+33022,1,"I think it's such a great question, because energy is under siege by the Obama administration.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+32908,1,"She didn't answer it, because when Ambassador Stevens...",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+25315,1,"Georgie Anne, we, believe me, supported the Simpson-Mazzoli bill strongly -- and the bill that came out of the Senate.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+17550,1,"In my opinion, as we deal with this deficit, people from about $70,000 a year on down have to be dealt with very, very carefully, because they are the ones who didn't get any relief the first time around.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+27084,1,They're willing to work with us.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+27076,1,"And finally, we don't want to have military involvement there.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+4240,1,I immediately said that this was illegal and objectionable.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+21629,1,Mr. Perot wants to do the same thing.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+19513,1,"And, I might add, with the democratic Russia.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+28132,1,"Listen, for 24 years I have never been afraid to take on the big drug companies.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+25941,1,They may be danger -- I voted I for everything since that time.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+16778,1,"Well, that bill has not yet come down to the Oval Office, so I am not in a position to make any judgment on it tonight.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+13966,1,Mr. Perot says it's a bad deal.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+7600,1,In the first place I've never suggested that Cuba was lost except for the present.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+16617,1,But it was a tremendous shift from administrative jobs into the delivery of services.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+16707,1,The reorganization proposal that I have put forward is one uh first step.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+13917,1,And I got a long history of doing that.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+12414,1,"That's going to be up to the people, isn't it?",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+34259,1,"We're giving them lots of money, lots of everything.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+20839,1,And many of the public schools are meeting the call.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+12251,1,We are a big industrial state.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+24998,1,"Now, they claim they're not.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+34170,1,I guess he believes it makes him look better now to contrast with me because I did vote for it.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+1111,1,I got a- a complete report back from those countries from these two distinguished - uh - gentlemen.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+34006,1,"... because your donors and your special interests are doing the same thing as I do, except even more so.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+29041,1,"Highest private home ownership ever, but I'll make you one promise here.",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+12904,1,He says he supports the President's position.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+27393,1,Now we're changing to one conflict.,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0

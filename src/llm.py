@@ -110,6 +110,8 @@ def run_llm_cross_validation(
             classification_report(test_data[label_column], preds, output_dict=True)
         )
         reports.append(report)
+        print(predictions.head(10))
+        print(test_data.head(10))
     result = pd.DataFrame(reports)
     result.loc["Average"] = result.mean()
     if save_folder is not None:
