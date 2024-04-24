@@ -35,6 +35,10 @@ models/*
 # Wand logging
 wandb/*
 
+#Individual RAWFC files
+data/RAWFC/train/*
+data/RAWFC/val/*
+data/RAWFC/test/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
