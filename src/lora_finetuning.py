@@ -8,7 +8,7 @@ from transformers import TrainingArguments, Pipeline
 from trl import SFTTrainer
 import pandas as pd
 from datasets import Dataset
-from llm import load_huggingface_model, HuggingFaceModel
+from llm import add_average_row, load_huggingface_model, HuggingFaceModel
 from dataset_utils import convert_to_lora_dataset, CustomDataset, ProgressDataset
 from claimbuster_utils import load_claimbuster_dataset
 from liar_utils import load_liar_dataset
@@ -120,7 +120,7 @@ def output_to_pred(output, regex_finder):
         return int(pred[0])
     return 0
 
-def run_truthfulness_experiment(model_id: HuggingFaceModel=HuggingFaceModel.MISTRAL_7B_INSTRUCT):
+def run_truthfulness_experiment(model_id=HuggingFaceModel.MISTRAL_7B_INSTRUCT):
     """Runs experiment E5 where a model is fine-tuned on the whole ClaimBuster 
     dataset and is used to assess the check-wortiness of claims from the LIAR dataset."""
 
@@ -155,13 +155,7 @@ def run_truthfulness_experiment(model_id: HuggingFaceModel=HuggingFaceModel.MIST
     os.makedirs("results/LIAR", exist_ok=True)
     liar.to_csv("results/LIAR/checkworthiness.csv", index=True)
 
-
-def main():
-    run_truthfulness_experiment()
-    return
-    dataset = CustomDataset.CLAIMBUSTER
-    model_id = HuggingFaceModel.LLAMA2_7B_CHAT
-    folder="data/ClaimBuster" if dataset == CustomDataset.CLAIMBUSTER else "data/CheckThat"
+def run_fine_tuning_experiment(dataset, model_id, folder):
     with open(f"prompts/{dataset.value}/standard/zeroshot/instruction-lora.txt") as f:
         instruction = f.read().replace("\n", " ").strip()
     label_column = "Verdict" if dataset == CustomDataset.CLAIMBUSTER else "check_worthiness"
@@ -208,8 +202,18 @@ def main():
     os.makedirs(f"results/{dataset.value}/{model_id.name}/lora", exist_ok=True)
     predictions.to_csv(f"results/{dataset.value}/{model_id.name}/lora/predictions.csv")
     result = pd.DataFrame(reports)
-    result.loc["Average"] = result.mean()
+    result = add_average_row(result)
     result.to_csv(f"results/{dataset.value}/{model_id.name}/lora/crossval.csv")
+
+
+def main():
+    run_truthfulness_experiment()
+    dataset = CustomDataset.CLAIMBUSTER
+    model_id = HuggingFaceModel.LLAMA2_7B_CHAT
+    folder="data/ClaimBuster" if dataset == CustomDataset.CLAIMBUSTER else "data/CheckThat"
+    run_fine_tuning_experiment(dataset, model_id, folder)
+
+
     
 
 if __name__ == "__main__":

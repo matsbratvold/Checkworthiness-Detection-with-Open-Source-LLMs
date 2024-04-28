@@ -50,6 +50,7 @@ class PromptType(enum.Enum):
 
     STANDARD = "standard"
     CHAIN_OF_THOUGHT = "CoT"
+    LORA = "lora"
 
 class ICLUsage(enum.Enum):
 
@@ -110,17 +111,23 @@ def run_llm_cross_validation(
             classification_report(test_data[label_column], preds, output_dict=True)
         )
         reports.append(report)
-        print(predictions.head(10))
-        print(test_data.head(10))
     result = pd.DataFrame(reports)
-    result.loc["Average"] = result.mean()
+    result = add_average_row(result)
     if save_folder is not None:
         os.makedirs(save_folder, exist_ok=True)
         result.to_csv(f"{save_folder}/crossval.csv")
         predictions.to_csv(f"{save_folder}/predictions.csv")
     return result, predictions
 
-    
+def add_average_row(df: pd.DataFrame, use_confidence_intervals=True) -> pd.DataFrame:
+    """Adds an average row to a pandas dataframe. This assumes that all cells contain numbers."""
+    df.loc["Average"] = df.mean()
+    if not use_confidence_intervals:
+        return df
+    for column in df.columns:
+        df.loc["Average", column] = f"{df.loc['Average', column]:.4f} ± {2 * df.loc[:, column].std():.4f}"
+    return df
+
 def generate_llm_predictions(
     data: pd.DataFrame,
     prompts: List[str],
