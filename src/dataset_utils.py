@@ -9,6 +9,8 @@ import torch
 class CustomDataset(enum.Enum):
     CLAIMBUSTER = "ClaimBuster"
     CHECK_THAT = "CheckThat"
+    LIAR = "LIAR"
+    RAWFC = "RAWFC"
 
 class ProgressDataset(torch.utils.data.Dataset):
     """Dataset that can be used with tdqm to show progress"""

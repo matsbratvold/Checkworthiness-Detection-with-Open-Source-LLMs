@@ -44,7 +44,7 @@ def generate_dataset_from_individual_reports(folder_path: str):
     data_frame.to_csv(os.path.join(folder_path, "data.csv"))
     return data_frame
 
-def load_rawfc_dataset(folder_path: str):
+def load_rawfc_dataset(folder_path="data/RAWFC"):
     """Loads the RAWFC dataset. If it has not been generated get, then 
     it will be generated from the individual reports"""
     path = os.path.join(folder_path, "data.csv")
