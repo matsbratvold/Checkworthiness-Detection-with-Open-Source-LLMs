@@ -46,18 +46,24 @@ def load_check_that_dataset(
 def main():
     folder_path = "data/CheckThat"
     data = load_check_that_dataset(folder_path)
-    output_path = "data/CheckThat/lora.json"
-    with open("prompts/CheckThat/standard/zero-shot-lora.txt") as f:
-        instruction = f.read().replace("\n", " ").strip()
-    print(data.columns)
-    lora = convert_to_lora_dataset(
-        data=data, 
-        instruction=instruction,
-        output_path=output_path,
-        text_column="tweet_text",
-        label_column="check_worthiness",
-    )
-    print(lora.head())
+    data = data[["check_worthiness", "tweet_text"]]
+    # Rename columns
+    data = data.rename(columns={"check_worthiness": "label", "tweet_text": "text"})
+    print(data.head())
+    save_path = "/cluster/home/matssbra/fake-news-detection/Fake-news-detection/claimbuster-spotter-master/svm"
+    data.to_json(os.path.join(save_path, "checkthat_dataset.json"), orient="records")
+    # output_path = "data/CheckThat/lora.json"
+    # with open("prompts/CheckThat/standard/zero-shot-lora.txt") as f:
+    #     instruction = f.read().replace("\n", " ").strip()
+    # print(data.columns)
+    # lora = convert_to_lora_dataset(
+    #     data=data, 
+    #     instruction=instruction,
+    #     output_path=output_path,
+    #     text_column="tweet_text",
+    #     label_column="check_worthiness",
+    # )
+    # print(lora.head())
 
 
 

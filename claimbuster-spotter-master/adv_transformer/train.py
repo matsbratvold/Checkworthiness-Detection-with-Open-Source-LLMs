@@ -193,6 +193,7 @@ def main():
         kf.get_n_splits(all_data.x)
         agg_y, agg_pred = [], []
 
+        target_names = ['NCS', 'CFS']
         for iteration, (train_idx, test_idx) in enumerate(kf.split(all_data.x, all_data.y)):
             train_x, test_x = all_data.x[train_idx], all_data.x[test_idx]
             train_y, test_y = all_data.y[train_idx], all_data.y[test_idx]
@@ -212,6 +213,7 @@ def main():
                               DataLoader.compute_class_weights_fold(train_y), iteration)
 
             cur_y, cur_pred = eval_model(test_x, test_y, test_len, res[1])
+            print(classification_report(cur_y, np.argmax(cur_pred, axis=1), target_names=target_names, digits=4))
             agg_y = np.concatenate((agg_y, cur_y))
             try:
                 agg_pred = np.concatenate((agg_pred, cur_pred))
@@ -230,7 +232,6 @@ def main():
         f1_wei = f1_score(agg_y, np.argmax(agg_pred, axis=1), average='weighted')
         ndcg = compute_ndcg(agg_y, [x[FLAGS.cs_num_classes - 1] for x in agg_pred])
 
-        target_names = ['NCS', 'CFS']
 
         logging.info('Final stats | F1-Mac: {:>.4f} F1-Wei: {:>.4f} nDCG: {:>.4f}'.format(
             f1_mac, f1_wei, ndcg))
