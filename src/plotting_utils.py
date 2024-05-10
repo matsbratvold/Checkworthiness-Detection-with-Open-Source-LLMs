@@ -97,7 +97,7 @@ def show_bar_plot(
     #     plt.yticks(y_ticks)
     if use_bar_labels:
         for containers in bar.containers:
-            bar.bar_label(containers, fmt='%.2f')
+            bar.bar_label(containers, fmt='%.3f')
     if should_save(file_path, force_save):
         plt.savefig(file_path, bbox_inches="tight")
     plt.show()
