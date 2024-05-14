@@ -7,8 +7,6 @@ from typing import List, Union
 import pandas as pd
 import os
 
-from dataset_utils import convert_to_lora_dataset
-
 class CheckThatLabel(enum.Enum):
   CHECK_WORTHY = 1
   """ Check-worthy Tweet """

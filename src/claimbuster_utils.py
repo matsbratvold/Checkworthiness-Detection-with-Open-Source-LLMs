@@ -1,5 +1,6 @@
 """This module contains utils related to the claimbuster dataset"""
 
+from src.dataset_utils import convert_to_lora_dataset
 from enum import Enum
 from typing import List
 import pandas as pd
@@ -7,7 +8,6 @@ import os
 from sklearn.feature_extraction.text import TfidfVectorizer
 import re
 from nltk.tokenize import sent_tokenize
-from dataset_utils import convert_to_lora_dataset
 
 class ClaimbusterMultiClassLabel(Enum):
     CFS = 1

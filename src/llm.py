@@ -1,6 +1,11 @@
 """This module uses LLMs to perform checkworthiness detection using Huggingface models
 through the transformers library"""
 
+from src.checkthat_utils import load_check_that_dataset
+from src.claimbuster_utils import load_claimbuster_dataset
+from src.dataset_utils import ProgressDataset
+from src.result_analysis import flatten_classification_report
+from src.dataset_utils import CustomDataset
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import classification_report
 from sklearn.model_selection import StratifiedKFold, cross_validate
@@ -11,19 +16,18 @@ from transformers import (
     pipeline,
     Pipeline,
 )
-from claimbuster_utils import load_claimbuster_dataset
 from tqdm.auto import tqdm
 from peft import AutoPeftModelForCausalLM, LoraConfig
 import enum
 import torch
 import pandas as pd
-from typing import List, Tuple, Union
+from typing import Dict, List, Tuple, Union
 import os
 import json
 import re
 import numpy as np
-from dataset_utils import ProgressDataset
-from result_analysis import flatten_classification_report
+import argparse
+import timeit
 
 BNB_CONFIG = BitsAndBytesConfig(
     load_in_4bit=True,
@@ -40,6 +44,11 @@ DEFAULT_LORA_CONFIG = LoraConfig(
     target_modules=['up_proj', 'k_proj', 'down_proj', 'o_proj', 'q_proj', 'v_proj', 'gate_proj']
 )
 
+DICT_MATCHER = re.compile(r"{.*}")
+SCORE_MATCHER = re.compile(r"([Ss]core[^\d]*)(\d+)")
+NON_CHECKWORTHY_MATCHER = re.compile(
+    r"(non-checkworthy)|(not check-worthy)|(non check-worthy)"
+)
 
 class HuggingFaceModel(enum.Enum):
     MISTRAL_7B_INSTRUCT = "mistralai/Mistral-7B-Instruct-v0.2"
@@ -57,6 +66,10 @@ class ICLUsage(enum.Enum):
     ZERO_SHOT = "zeroshot"
     FEW_SHOT = "fewshot"
 
+class Experiment(enum.Enum):
+
+    CHECKWORTHINESS = "CW"
+    INFERENCE_TIME = "IT"
 
 class ThresholdOptimizer(BaseEstimator, TransformerMixin):
     """Optimizing the threshold value (0-100) to separate check-worthy
@@ -128,6 +141,26 @@ def add_average_row(df: pd.DataFrame, use_confidence_intervals=True) -> pd.DataF
         df.loc["Average", column] = f"{df.loc['Average', column]:.4f} ± {2 * df.loc[:, column].std():.4f}"
     return df
 
+def _output_to_pred(
+        raw_response: str, 
+        dict_matcher: re.Pattern, 
+        score_matcher: re.Pattern,
+        non_check_worthy_matcher: re.Pattern
+    ) -> Dict[str, str | int]:
+    try:
+        prediction = json.loads(dict_matcher.search(raw_response).group(0))
+        score = prediction["score"]
+        reasoning = prediction["reasoning"]
+    except (json.decoder.JSONDecodeError, AttributeError, KeyError, ValueError) as e:
+        score = score_matcher.search(raw_response)
+        reasoning = None
+        if score is not None:
+            score = score[2]
+        else:
+            score = 0.0 if non_check_worthy_matcher.search(raw_response) else np.nan
+    return {"score": score, "reasoning": reasoning}
+
+
 def generate_llm_predictions(
     data: pd.DataFrame,
     prompts: List[str],
@@ -141,33 +174,20 @@ def generate_llm_predictions(
     """Generate a set of predictions using an LLM"""
     prompts_data = ProgressDataset(prompts)
     dataset_with_scores = data.copy()
-    dict_matcher = re.compile(r"{.*}")
-    score_matcher = re.compile(r"([Ss]core[^\d]*)(\d+)")
-    non_check_worthy_matcher = re.compile(
-        r"(non-checkworthy)|(not check-worthy)|(non check-worthy)"
-    )
+    
     responses = pipe(prompts_data, batch_size=batch_size)
     for index, result in enumerate(tqdm(responses, total=len(prompts))):
         response = result[0]["generated_text"].replace("\n", "")
         dataset_with_scores.loc[data.index[index], "raw_response"] = response 
         dataset_index = data.index[index]
-        try:
-            parsed_json = json.loads(dict_matcher.search(response).group(0))
-            dataset_with_scores.loc[dataset_index, "score"] = parsed_json["score"]
-            dataset_with_scores.loc[dataset_index, "reasoning"] = parsed_json["reasoning"]
-        except (json.decoder.JSONDecodeError, AttributeError, KeyError, ValueError) as e:
-            score = score_matcher.search(response)
-            if score is not None:
-                score = score[2]
-            else:
-                score = 0.0 if non_check_worthy_matcher.search(response) else np.nan
-            dataset_with_scores.loc[dataset_index, "score"] = score
-            dataset_with_scores.loc[dataset_index, "reasoning"] = None
-            continue
+        prediction = _output_to_pred(response, DICT_MATCHER, SCORE_MATCHER, NON_CHECKWORTHY_MATCHER)
+        dataset_with_scores.loc[dataset_index, "score"] = prediction["score"]
+        dataset_with_scores.loc[dataset_index, "reasoning"] = prediction["reasoning"]
     columns =  [label_column, "score", text_column, "reasoning", "raw_response"]
     dataset_with_scores = dataset_with_scores[columns]
-    os.makedirs(os.path.dirname(save_path), exist_ok=True)
-    dataset_with_scores.to_csv(save_path, index=True)
+    if save_path is not None:
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        dataset_with_scores.to_csv(save_path, index=True)
     return dataset_with_scores
 
 def load_huggingface_model(
@@ -203,7 +223,6 @@ def load_huggingface_model(
     tokenizer = AutoTokenizer.from_pretrained(model_id.value)
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = "left"
-    print(f"{max_new_tokens=}")
     pipe = pipeline(
         "text-generation",
         model=model,
@@ -214,62 +233,127 @@ def load_huggingface_model(
     )
     return pipe
 
+def parse_arguments() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Generate check-worthiness detection predicitons with Open Source LLMs"
+    )
+    parser.add_argument(
+        "--experiment",
+        default=Experiment.CHECKWORTHINESS.value,
+        choices=[Experiment.CHECKWORTHINESS.value, Experiment.INFERENCE_TIME.value]
+    )
+    parser.add_argument(
+        "--dataset",
+        default= CustomDataset.CLAIMBUSTER.value,
+        choices=[CustomDataset.CLAIMBUSTER.value, CustomDataset.CHECK_THAT.value],
+    )
+    parser.add_argument(
+        "--prompt-type",
+        default=PromptType.STANDARD.value,
+        choices=[PromptType.STANDARD.value, PromptType.CHAIN_OF_THOUGHT.value]
+    )
+    parser.add_argument(
+        "--icl_usage",
+        default=ICLUsage.ZERO_SHOT.value,
+        choices=[ICLUsage.ZERO_SHOT.value, ICLUsage.FEW_SHOT.value]
+    )
+    parser.add_argument(
+        "--batch-size",
+        default=32,
+        choices=range(1, 257),
+        type=int
+    )
+    parser.add_argument(
+        "--max-new-tokens",
+        default=64,
+        choices=range(1, 1025),
+        type=int
+    )
+    parser.add_argument(
+        "--model-id",
+        default=HuggingFaceModel.MISTRAL_7B_INSTRUCT.value,
+        choices=[
+            HuggingFaceModel.MISTRAL_7B_INSTRUCT.value, 
+            HuggingFaceModel.MIXTRAL_INSTRUCT.value, 
+            HuggingFaceModel.LLAMA2_7B_CHAT.value
+        ]
+    )
+    return parser.parse_args()
+
 
 def main():
+    args = parse_arguments()
+    print(args)
+    dataset_name = args.dataset
 
-    device = "cuda"  # the device to load the model onto
 
-    bnb_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype="float16",
-        bnb_4bit_use_double_quant=False,
+    if dataset_name == CustomDataset.CLAIMBUSTER.value:
+        dataset = load_claimbuster_dataset("data/ClaimBuster/datasets")
+        label_column = "Verdict"
+        text_column = "Text"
+    else:
+        dataset = load_check_that_dataset("data/CheckThat")
+        label_column = "check_worthiness"
+        text_column = "tweet_text"
+
+    instruction_path = os.path.join(
+        "prompts",
+        args.dataset,
+        args.prompt_type,
+        args.icl_usage,
+        "instruction.txt"
     )
+    assert os.path.exists(instruction_path), "No prompt exist for the given configuration."
+    with open(instruction_path, "r") as f:
+        instruction = f.read().replace("\n", "")
+    print(instruction)
 
-    model = AutoModelForCausalLM.from_pretrained(
-        "mistralai/Mistral-7B-Instruct-v0.2",
-        quantization_config=bnb_config,
-        device_map={"": 0},
+    print("Loading model...")
+    model_id = [value for value in HuggingFaceModel if value.value == args.model_id][0]
+    pipe = load_huggingface_model(
+        model_id=model_id, 
+        max_new_tokens=args.max_new_tokens
     )
-    tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-Instruct-v0.2")
-    tokenizer.pad_token = tokenizer.eos_token
-    tokenizer.padding_side = "left"
-    pipe = pipeline(
-        "text-generation",
-        model=model,
-        tokenizer=tokenizer,
-        return_full_text=False,
-        max_new_tokens=256,
-        pad_token_id=tokenizer.eos_token_id,
-    )
+    if args.experiment == Experiment.INFERENCE_TIME.value:
+        dataset = dataset.sample(100)
+    prompts = [ f"[INST]{instruction} '''{text}'''[/INST]" for text in dataset[text_column]]
 
-    with open("prompts/ClaimBuster/standard/zero-shot.txt", "r") as f:
-        instruction = f.read()
-
-    data = load_claimbuster_dataset("data/ClaimBuster/datasets")
-    texts = data["Text"]
-    prompts = [f"{instruction} '''{text}'''" for text in texts]
-    print(prompts.__getitem__(0))
-
-    # dataset_with_scores = data.copy()
-    # for index, result in enumerate(tqdm(pipe(prompts, batch_size=256), total=len(prompts))):
-    #     parsed_json = json.loads(result.replace("\n", ""))["generated_text"]
-    #     dataset_with_scores.loc[index, "score"] = parsed_json["score"]
-    #     dataset_with_scores.loc[index, "reasoning"] = parsed_json["reasoning"]
-    # dataset_with_scores.to_csv("results/ClaimBuster/zeroshot.csv", index=True)
-
-    # generated_ids = []
-    # for text in texts:
-    #     prompt = f"{instruction} '''{text}'''"
-    #     with torch.no_grad():
-    #         generated_ids += pipe(prompt)
-    # print(generated_ids)
-
-    # messages = [
-    #     {"role": "user", "content": "What is your favourite condiment?"},
-    #     {"role": "assistant", "content": "Well, I'm quite partial to a good squeeze of fresh lemon juice. It adds just the right amount of zesty flavour to whatever I'm cooking up in the kitchen!"},
-    #     {"role": "user", "content": "Do you have mayonnaise recipes?"}
-    # ]
+    if args.experiment == Experiment.CHECKWORTHINESS.value:
+        model_name = [value.name for value in HuggingFaceModel if value.value == args.model_id][0]
+        save_path = os.path.join(
+            "../results",
+            dataset_name,
+            model_name,
+            args.prompt_type,
+            args.icl_usage,
+            "generated_scores.csv"
+        )
+        print("Generating predictions...")
+        generate_llm_predictions(
+            data=dataset,
+            prompts=prompts, 
+            pipe=pipe,
+            batch_size=args.batch_size,
+            label_column = label_column,
+            text_column=text_column,
+            save_path=save_path
+        )
+    else:
+        print("Starting inference time experiment")
+        def generate_predictions():
+            output = pipe(prompts, batch_size=args.batch_size)
+            preds = []
+            for output in output:
+                output = output[0]["generated_text"].replace("\n", "")
+                pred = _output_to_pred(
+                    output,
+                    DICT_MATCHER,
+                    SCORE_MATCHER,
+                    NON_CHECKWORTHY_MATCHER
+                )
+                preds.append(pred)
+            return preds
+        print(f"Total inference time: {timeit.timeit(generate_predictions, number=10)}")
 
 
 if __name__ == "__main__":

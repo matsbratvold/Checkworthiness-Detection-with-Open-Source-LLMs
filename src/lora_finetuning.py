@@ -17,6 +17,7 @@ import re
 from result_analysis import flatten_classification_report
 from tqdm.auto import tqdm
 import os
+import timeit
 
 DEFAULT_TRAINING_ARGS = TrainingArguments(
     output_dir="checkpoints/",
@@ -210,9 +211,37 @@ def run_fine_tuning_experiment(dataset, model_id, folder):
     result = add_average_row(result)
     result.to_csv(f"results/{dataset.value}/{model_id.name}/lora/crossval.csv")
 
+def run_run_time_experiment():
+    """Runs experiment E6 which evaluates the runtime of a fine-tuned Mistral Instruct
+    model on 100 samples from the ClaimBuster dataset. It is then repeated 10 times."""
+
+    data = load_claimbuster_dataset(folder_path="data/ClaimBuster/datasets")
+    samples = data.sample(100)
+    with open(f"prompts/ClaimBuster/standard/zeroshot/instruction-lora.txt") as f:
+        instruction = f.read().replace("\n", " ").strip()
+    prompts = ProgressDataset([f"[INST]{instruction} '''{text}'''[/INST]" for text in samples["Text"]])
+    pipeline = load_huggingface_model(
+        HuggingFaceModel.MISTRAL_7B_INSTRUCT,
+        lora_path="models/ClaimBuster_full/final_checkpoint",
+        max_new_tokens=64
+    )
+
+    def run_inference_on_100_samples():
+        preds = []
+        pred_finder = re.compile("0|1")
+        for output in pipeline(prompts, batch_size=32):
+            preds.append(output_to_pred(output, pred_finder))
+        return preds
+    
+    print(timeit.timeit(run_inference_on_100_samples, number=10))
+    
+
+
+
 
 def main():
-    run_truthfulness_experiment(test_dataset=CustomDataset.RAWFC)
+    run_run_time_experiment()
+    # run_truthfulness_experiment(test_dataset=CustomDataset.RAWFC)
     # dataset = CustomDataset.CLAIMBUSTER
     # model_id = HuggingFaceModel.LLAMA2_7B_CHAT
     # folder="data/ClaimBuster" if dataset == CustomDataset.CLAIMBUSTER else "data/CheckThat"
