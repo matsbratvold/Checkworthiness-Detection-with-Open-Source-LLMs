@@ -1,6 +1,12 @@
 """In this module, LORA is used to fine-tune LLMs from HuggingFace. It is based on the implemenation from 
 https://github.com/huggingface/trl/blob/main/examples/research_projects/stack_llama/scripts/supervised_finetuning.py"""
 
+from src.llm import add_average_row, load_huggingface_model, HuggingFaceModel
+from src.dataset_utils import convert_to_lora_dataset, CustomDataset, ProgressDataset
+from src.claimbuster_utils import load_claimbuster_dataset
+from src.liar_utils import load_liar_dataset
+from src.rawfc_utils import load_rawfc_dataset
+from src.result_analysis import flatten_classification_report
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import classification_report
@@ -8,32 +14,30 @@ from transformers import TrainingArguments, Pipeline
 from trl import SFTTrainer
 import pandas as pd
 from datasets import Dataset
-from llm import add_average_row, load_huggingface_model, HuggingFaceModel
-from dataset_utils import convert_to_lora_dataset, CustomDataset, ProgressDataset
-from claimbuster_utils import load_claimbuster_dataset
-from liar_utils import load_liar_dataset
-from rawfc_utils import load_rawfc_dataset
 import re
-from result_analysis import flatten_classification_report
 from tqdm.auto import tqdm
 import os
 import timeit
 
-DEFAULT_TRAINING_ARGS = TrainingArguments(
-    output_dir="checkpoints/",
-    max_steps=1000,
-    gradient_accumulation_steps=1,
-    learning_rate=1e-4,
-    lr_scheduler_type="cosine",
-    warmup_ratio=0.03,
-    save_steps=1000,
-    logging_steps=1,
-    fp16=True,
-    gradient_checkpointing=False,
-    seed=0,
-    optim="paged_adamw_8bit",
-    per_device_train_batch_size=4,
-)
+try:
+    DEFAULT_TRAINING_ARGS = TrainingArguments(
+        output_dir="checkpoints/",
+        max_steps=1000,
+        gradient_accumulation_steps=1,
+        learning_rate=1e-4,
+        lr_scheduler_type="cosine",
+        warmup_ratio=0.03,
+        save_steps=1000,
+        logging_steps=1,
+        fp16=True,
+        gradient_checkpointing=False,
+        seed=0,
+        optim="paged_adamw_8bit",
+        per_device_train_batch_size=4,
+    )
+except ValueError as e:
+    print(f"The following error occured while setting training arguments: {e}\nUsing default arguments instead.")
+    DEFAULT_TRAINING_ARGS = TrainingArguments(output_dir="checkpoints/")
 
 DEFAULT_LORA_CONFIG = LoraConfig(
     r=16,
@@ -171,9 +175,23 @@ def run_fine_tuning_experiment(dataset, model_id, folder):
     
     # Run cross validation
     reports = []
-    predictions = pd.DataFrame(index=pd.Index([], name=index_col))
+    predictions_path = f"results/{dataset.value}/{model_id.name}/lora/predictions.csv"
+    if os.path.exists(predictions_path):
+        predictions = pd.read_csv(predictions_path, index_col=0)
+    else:
+        predictions = pd.DataFrame(index=pd.Index([], name=index_col))
     for i in range(4):
-        lora_path = f"models/{model_id.name}/{dataset.value}_crossval{i}/final_checkpoint"
+        test = pd.read_json(f"{folder}/crossval/test_{i}.json")
+        if (len(test[index_col]) == len(set(predictions.index) & set(test[index_col]))):
+            print(f"Already generated predictions for fold {i}")
+
+            preds = predictions.loc[list(test[index_col])]
+            report = flatten_classification_report(
+                classification_report(test[label_column], preds, output_dict=True)
+            )
+            reports.append(report)
+            continue
+        lora_path = f"models/{dataset.value}/{model_id.name}/lora/predictions.csv"
         already_finetuned = os.path.exists(lora_path)
         pipe = load_huggingface_model(
             model_id,
@@ -191,7 +209,6 @@ def run_fine_tuning_experiment(dataset, model_id, folder):
             )
             run_training(pipe=pipe, run_name=f"{model_id.name}/{dataset.value}_crossval{i}", train_data=train_data) 
         print(f"Starting inference on test set for fold {i}")
-        test = pd.read_json(f"{folder}/crossval/test_{i}.json")
         prompts = ProgressDataset([f"[INST]{instruction} '''{text}'''[/INST]" for text in test[text_column]])
         outputs = pipe(prompts, batch_size=batch_size)
         pred_finder = re.compile("0|1")
@@ -240,12 +257,12 @@ def run_run_time_experiment():
 
 
 def main():
-    run_run_time_experiment()
+    # run_run_time_experiment()
     # run_truthfulness_experiment(test_dataset=CustomDataset.RAWFC)
-    # dataset = CustomDataset.CLAIMBUSTER
-    # model_id = HuggingFaceModel.LLAMA2_7B_CHAT
-    # folder="data/ClaimBuster" if dataset == CustomDataset.CLAIMBUSTER else "data/CheckThat"
-    # run_fine_tuning_experiment(dataset, model_id, folder)
+    dataset = CustomDataset.CHECK_THAT
+    model_id = HuggingFaceModel.LLAMA2_7B_CHAT
+    folder="data/ClaimBuster" if dataset == CustomDataset.CLAIMBUSTER else "data/CheckThat"
+    run_fine_tuning_experiment(dataset, model_id, folder)
 
 
     

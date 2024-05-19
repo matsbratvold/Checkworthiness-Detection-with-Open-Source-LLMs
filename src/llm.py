@@ -21,13 +21,14 @@ from peft import AutoPeftModelForCausalLM, LoraConfig
 import enum
 import torch
 import pandas as pd
-from typing import Dict, List, Tuple, Union
+from typing import Dict, Iterable, List, Tuple, Union
 import os
 import json
 import re
 import numpy as np
 import argparse
 import timeit
+import scipy.stats as st
 
 BNB_CONFIG = BitsAndBytesConfig(
     load_in_4bit=True,
@@ -92,7 +93,6 @@ class ThresholdOptimizer(BaseEstimator, TransformerMixin):
         self.threshold = max(
             reports, key=lambda report: report["macro avg"]["f1-score"]
         )["threshold"]
-        print(f"{self.threshold=}")
 
     def predict(self, x: pd.DataFrame):
         predictions = x["score"].map(lambda x: 1 if x >= self.threshold else 0)
@@ -123,6 +123,7 @@ def run_llm_cross_validation(
         report = flatten_classification_report(
             classification_report(test_data[label_column], preds, output_dict=True)
         )
+        report["threshold"] = optimizer.threshold
         reports.append(report)
     result = pd.DataFrame(reports)
     result = add_average_row(result)
@@ -132,13 +133,23 @@ def run_llm_cross_validation(
         predictions.to_csv(f"{save_folder}/predictions.csv")
     return result, predictions
 
+def calculate_confidence_interval_error(values: Iterable[float|int], confidence=0.95) -> float:
+    if (st.sem(values) == 0):
+        return 0
+    confidence_interval: Tuple[float, float] = st.t.interval(
+        confidence, len(values)-1, loc=np.mean(values), scale=st.sem(values)
+    )
+    return confidence_interval[1] - np.mean(values)
+
 def add_average_row(df: pd.DataFrame, use_confidence_intervals=True) -> pd.DataFrame:
     """Adds an average row to a pandas dataframe. This assumes that all cells contain numbers."""
     df.loc["Average"] = df.mean()
     if not use_confidence_intervals:
         return df
     for column in df.columns:
-        df.loc["Average", column] = f"{df.loc['Average', column]:.4f} ± {2 * df.loc[:, column].std():.4f}"
+        values = df.loc[:, column]
+        error = calculate_confidence_interval_error(values)
+        df.loc["Average", column] = f"{df.loc['Average', column]:.4f} ± {error:.4f}"
     return df
 
 def _output_to_pred(
@@ -284,6 +295,7 @@ def parse_arguments() -> argparse.Namespace:
 def main():
     args = parse_arguments()
     print(args)
+    return
     dataset_name = args.dataset
 
 
