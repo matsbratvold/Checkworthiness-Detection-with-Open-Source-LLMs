@@ -31,6 +31,7 @@ def generate_error_analysis_report(
     predictions: Iterable[pd.DataFrame],
     model_names: Iterable[str],
     folder_path: str = None,
+    reasoning: pd.Series = None,
     label_column_name = "Verdict",
     text_column_name = "Text",
 ):
@@ -75,19 +76,23 @@ def generate_error_analysis_report(
             for data, model_name in zip(filtered_data, model_names)
         ]
         all_data = pd.concat(filtered_data, axis=1)
+        if reasoning is not None:
+            all_data["reasoning"] = reasoning.loc[all_data.index]
         columns = [
             label_column_name, 
             text_column_name, 
+            *(["reasoning"] if reasoning is not None else []), 
             *[f"{name}_prediction" for name in model_names], 
         ]
         all_data = all_data.loc[:, ~all_data.columns.duplicated()][columns]
-        all_data.to_csv(f"../results/{folder_path}/errors/{filename}")
+        all_data.to_csv(f"{folder_path}/errors/{filename}")
 
-def display_confusion_matrix(
+def create_confusion_matrix(
     original_data: pd.DataFrame,
     predictions: Iterable[float],
     label_column_name = "Verdict",
     save_path: str = None,
+    show = False,
 ):
     """Display a confusion matrix"""
     y_true = original_data[label_column_name]
@@ -101,4 +106,7 @@ def display_confusion_matrix(
     plt.ylabel("True label")
     if save_path is not None:
         plt.savefig(save_path)
-    plt.show()
+    if show:
+        plt.show()
+    else:
+        plt.clf()
