@@ -32,15 +32,11 @@ def show_word_cloud(text: str, title: str, file_path: str = None):
     file_path: str (default = None)
         The file path to save the plot
     """
-    exists = os.path.exists(file_path if file_path is not None else '')
-    if exists:
-        word_cloud = plt.imread(file_path)
-    else:
-        word_cloud = WordCloud(stopwords=stopwords.get_stopwords("en")).generate(text)
+    word_cloud = WordCloud(stopwords=stopwords.get_stopwords("en"), height=1000, width=2000).generate(text)
     plt.imshow(word_cloud, interpolation="bilinear")
     plt.title(title)
     plt.axis("off")
-    if not exists and file_path is not None:
+    if  file_path is not None:
         plt.imsave(file_path, word_cloud.to_array())
     plt.show()
 
