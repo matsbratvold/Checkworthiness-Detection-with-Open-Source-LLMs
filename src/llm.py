@@ -143,13 +143,15 @@ def calculate_confidence_interval_error(values: Iterable[float|int], confidence=
 
 def add_average_row(df: pd.DataFrame, use_confidence_intervals=True) -> pd.DataFrame:
     """Adds an average row to a pandas dataframe. This assumes that all cells contain numbers."""
-    df.loc["Average"] = df.mean()
     if not use_confidence_intervals:
+        df.loc["Average"] = df.mean()
         return df
+    df.loc["Average"] = ['' for _ in df.columns]
     for column in df.columns:
-        values = df.loc[:, column]
+        values = df.loc[df.index != "Average", column]
         error = calculate_confidence_interval_error(values)
-        df.loc["Average", column] = f"{df.loc['Average', column]:.4f} ± {error:.4f}"
+        average_value = values.mean()
+        df.loc["Average", column] = f"{average_value:.4f} ± {error:.4f}"
     return df
 
 def _output_to_pred(

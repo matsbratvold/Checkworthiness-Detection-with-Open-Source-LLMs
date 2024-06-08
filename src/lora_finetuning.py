@@ -18,6 +18,7 @@ import re
 from tqdm.auto import tqdm
 import os
 import timeit
+import itertools
 
 try:
     DEFAULT_TRAINING_ARGS = TrainingArguments(
@@ -257,12 +258,15 @@ def run_run_time_experiment():
 
 
 def main():
+    pass
     # run_run_time_experiment()
     # run_truthfulness_experiment(test_dataset=CustomDataset.RAWFC)
-    dataset = CustomDataset.CHECK_THAT
-    model_id = HuggingFaceModel.LLAMA2_7B_CHAT
-    folder="data/ClaimBuster" if dataset == CustomDataset.CLAIMBUSTER else "data/CheckThat"
-    run_fine_tuning_experiment(dataset, model_id, folder)
+    model_ids = [HuggingFaceModel.MISTRAL_7B_INSTRUCT, HuggingFaceModel.LLAMA2_7B_CHAT]
+    datasets = [CustomDataset.CLAIMBUSTER, CustomDataset.CHECK_THAT]
+    for model_id, dataset in itertools.product(model_ids, datasets):
+        print(f"Running fine-tuning experiment on the {dataset.name} dataset with the {model_id.name} model")
+        folder="data/ClaimBuster" if dataset == CustomDataset.CLAIMBUSTER else "data/CheckThat"
+        run_fine_tuning_experiment(dataset, model_id, folder)
 
 
     
