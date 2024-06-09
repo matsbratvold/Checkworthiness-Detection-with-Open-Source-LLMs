@@ -1,7 +1,8 @@
 """In this module, LORA is used to fine-tune LLMs from HuggingFace. It is based on the implemenation from 
 https://github.com/huggingface/trl/blob/main/examples/research_projects/stack_llama/scripts/supervised_finetuning.py"""
 
-from src.llm import add_average_row, load_huggingface_model, HuggingFaceModel
+import argparse
+from src.llm import Experiment, add_average_row, load_huggingface_model, HuggingFaceModel
 from src.dataset_utils import convert_to_lora_dataset, CustomDataset, ProgressDataset
 from src.claimbuster_utils import load_claimbuster_dataset
 from src.liar_utils import load_liar_dataset
@@ -18,7 +19,6 @@ import re
 from tqdm.auto import tqdm
 import os
 import timeit
-import itertools
 
 try:
     DEFAULT_TRAINING_ARGS = TrainingArguments(
@@ -166,7 +166,8 @@ def run_truthfulness_experiment(
     os.makedirs(f"results/{test_dataset.name}", exist_ok=True)
     test_data.to_csv(f"results/{test_dataset.name}/checkworthiness.csv", index=True)
 
-def run_fine_tuning_experiment(dataset, model_id, folder):
+def run_fine_tuning_experiment(dataset: CustomDataset, model_id: HuggingFaceModel):
+    """Runs experiment E4 which performs LoRA fine-tuning"""
     with open(f"prompts/{dataset.value}/standard/zeroshot/instruction-lora.txt") as f:
         instruction = f.read().replace("\n", " ").strip()
     label_column = "Verdict" if dataset == CustomDataset.CLAIMBUSTER else "check_worthiness"
@@ -177,6 +178,7 @@ def run_fine_tuning_experiment(dataset, model_id, folder):
     # Run cross validation
     reports = []
     predictions_path = f"results/{dataset.value}/{model_id.name}/lora/predictions.csv"
+    folder = f"data/{dataset.value}"
     if os.path.exists(predictions_path):
         predictions = pd.read_csv(predictions_path, index_col=0)
     else:
@@ -229,10 +231,9 @@ def run_fine_tuning_experiment(dataset, model_id, folder):
     result = add_average_row(result)
     result.to_csv(f"results/{dataset.value}/{model_id.name}/lora/crossval.csv")
 
-def run_run_time_experiment():
+def run_inference_time_experiment():
     """Runs experiment E6 which evaluates the runtime of a fine-tuned Mistral Instruct
     model on 100 samples from the ClaimBuster dataset. It is then repeated 10 times."""
-
     data = load_claimbuster_dataset(folder_path="data/ClaimBuster/datasets")
     samples = data.sample(100)
     with open(f"prompts/ClaimBuster/standard/zeroshot/instruction-lora.txt") as f:
@@ -253,23 +254,58 @@ def run_run_time_experiment():
     
     print(timeit.timeit(run_inference_on_100_samples, number=10))
     
-
+def parse_arguments() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Peforfm LoRA-finetung with Open Source LLMs"
+    )
+    parser.add_argument(
+        "--experiment",
+        default=Experiment.FINE_TUNING.value,
+        choices=[
+            Experiment.FINE_TUNING.value, 
+            Experiment.INFERENCE_TIME.value, 
+            Experiment.TRUTH_FULNESS.value
+        ]
+    )
+    parser.add_argument(
+        "--dataset",
+        default= CustomDataset.CLAIMBUSTER.value,
+        choices=[
+            CustomDataset.CLAIMBUSTER.value, 
+            CustomDataset.CHECK_THAT.value, 
+            CustomDataset.LIAR.value, 
+            CustomDataset.RAWFC.value
+        ],
+    )
+    parser.add_argument(
+        "--model-id",
+        default=HuggingFaceModel.MISTRAL_7B_INSTRUCT.value,
+        choices=[
+            HuggingFaceModel.MISTRAL_7B_INSTRUCT.value, 
+            HuggingFaceModel.MIXTRAL_INSTRUCT.value, 
+            HuggingFaceModel.LLAMA2_7B_CHAT.value
+        ]
+    )
+    return parser.parse_args()
 
 
 
 def main():
-    pass
-    # run_run_time_experiment()
-    # run_truthfulness_experiment(test_dataset=CustomDataset.RAWFC)
-    model_ids = [HuggingFaceModel.MISTRAL_7B_INSTRUCT, HuggingFaceModel.LLAMA2_7B_CHAT]
-    datasets = [CustomDataset.CLAIMBUSTER, CustomDataset.CHECK_THAT]
-    for model_id, dataset in itertools.product(model_ids, datasets):
-        print(f"Running fine-tuning experiment on the {dataset.name} dataset with the {model_id.name} model")
-        folder="data/ClaimBuster" if dataset == CustomDataset.CLAIMBUSTER else "data/CheckThat"
-        run_fine_tuning_experiment(dataset, model_id, folder)
 
+    args = parse_arguments()
+    dataset = [dataset for dataset in CustomDataset if dataset.value == args.dataset][0]
+    model_id = [model_id for model_id in HuggingFaceModel if model_id.value == args.model_id][0]
 
-    
+    if args.experiment == Experiment.FINE_TUNING.value:
+        assert dataset in [CustomDataset.CLAIMBUSTER, CustomDataset.CHECK_THAT], "You should use either ClaimBuster or CheckThat to perform LoRA fine-tuning."
+        run_fine_tuning_experiment(dataset, model_id)
+    elif args.experiment == Experiment.INFERENCE_TIME.value:
+        print("Starting inference time experiment")
+        run_inference_time_experiment()
+    elif args.experiment == Experiment.TRUTH_FULNESS.value:
+        assert dataset in [CustomDataset.LIAR, CustomDataset.RAWFC], "You should use either LIAR or RAWFC to perform the truthfulness experiment"
+        print("Starting truthfulness experiment")
+        run_truthfulness_experiment(model_id = model_id, test_dataset=dataset)
 
 if __name__ == "__main__":
     main()
