@@ -8,7 +8,6 @@ from src.result_analysis import flatten_classification_report
 from src.dataset_utils import CustomDataset
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import classification_report
-from sklearn.model_selection import StratifiedKFold, cross_validate
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
