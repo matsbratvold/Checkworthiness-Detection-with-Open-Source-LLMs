@@ -8,6 +8,7 @@ The work is conducted as part of a Master's thesis in MTDT Computer Science at t
 ### [Claimbuster-spotter-master folder](/claimbuster-spotter-master)
 
 Contains the baseline models from [Meng et al. 2020](http://arxiv.org/abs/2002.07725). It contains only slight modifications from their [Github repository](https://github.com/utaresearch/claimbuster-spotter).
+This includes adding the option to run the models on the CheckThat dataset.
 
 ### [Data folder](/data)
 
