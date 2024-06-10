@@ -63,9 +63,21 @@ def load_claimbuster_dataset(
 
     Parameters
     ---------------------------
-    use_binary_labels: bool (default = False)
-        If true, use the binary labels CFS and NCS, merging the original
+    folder_path: str
+        The location where the dataset is located.
+    ncs_ratio: NCS_RATION (default = NCS_RATIO.TWO_AND_A_HALF)
+        The ratio of NCS to CFS sentences. This is only applied if
+        use_binary_labels is set to True
+    use_binary_labels: bool (default = True)
+        If True, the updated dataset with labels CFS and NCS are used.
+        If set to False, the original dataset with three classes is used
         UFS and NFS labels
+    use_contextual_features (default = False)
+        If set to True, the previous five sentences within the debate are added
+        to the resulting dataframe
+    debate_transcripts_folder (default = None)
+        Location of the debate transcripts. Is only applied if 
+        use_contextual_features is set to True
     """
     if use_binary_labels:
         data = pd.read_json(os.path.join(folder_path, f"{ncs_ratio.value}xNCS.json"))

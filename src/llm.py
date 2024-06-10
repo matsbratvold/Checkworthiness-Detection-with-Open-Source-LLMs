@@ -8,7 +8,6 @@ from src.result_analysis import flatten_classification_report
 from src.dataset_utils import CustomDataset
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import classification_report
-from sklearn.model_selection import StratifiedKFold, cross_validate
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
@@ -71,6 +70,9 @@ class Experiment(enum.Enum):
 
     CHECKWORTHINESS = "CW"
     INFERENCE_TIME = "IT"
+    FINE_TUNING = "FT"
+    TRUTH_FULNESS = "TF"
+
 
 class ThresholdOptimizer(BaseEstimator, TransformerMixin):
     """Optimizing the threshold value (0-100) to separate check-worthy
@@ -160,6 +162,7 @@ def _output_to_pred(
         score_matcher: re.Pattern,
         non_check_worthy_matcher: re.Pattern
     ) -> Dict[str, str | int]:
+    """Maps from a raw response to a prediction."""
     try:
         prediction = json.loads(dict_matcher.search(raw_response).group(0))
         score = prediction["score"]
@@ -295,9 +298,9 @@ def parse_arguments() -> argparse.Namespace:
 
 
 def main():
+    """Generates LLM predictions (experiment E1-E3) or performs an inference time
+    evaluation (experiment E6) for one specific LLM configuration"""
     args = parse_arguments()
-    print(args)
-    return
     dataset_name = args.dataset
 
 
